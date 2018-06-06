@@ -47,7 +47,7 @@ func HandleUpdate(e *gomastodon.UpdateEvent) {
 
 func HandleDelete(e *gomastodon.DeleteEvent) {
 	ctx := context.Background()
-	_, err := elastics.Client.Delete().Id(e.ID).Do(ctx)
+	_, err := elastics.Client.Delete().Index("status").Type("status").Id(e.ID).Do(ctx)
 	if err != nil {
 		log.Fatal(err)
 		return
