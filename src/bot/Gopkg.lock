@@ -8,10 +8,43 @@
   version = "v1.2.0"
 
 [[projects]]
-  name = "github.com/mattn/go-mastodon"
+  branch = "master"
+  name = "github.com/mailru/easyjson"
+  packages = [
+    ".",
+    "buffer",
+    "jlexer",
+    "jwriter"
+  ]
+  revision = "9825584555aa620c53c265d4a09ace0df1346fd9"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/microcosm-cc/bluemonday"
   packages = ["."]
-  revision = "730317321abbdea25c96311c94eee46ca253dfc9"
-  version = "v0.0.2"
+  revision = "995366fdf961d03629cd17361bddd32745718e2c"
+
+[[projects]]
+  name = "github.com/olivere/elastic"
+  packages = [
+    ".",
+    "config",
+    "uritemplates"
+  ]
+  revision = "dabcc5de0a3fd6313870c223c3119e2b1e942ba3"
+  version = "v6.1.23"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/robfig/cron"
+  packages = ["."]
+  revision = "b41be1df696709bb6395fe435af20370037c0b4c"
+  version = "v1.1"
 
 [[projects]]
   name = "github.com/tomnomnom/linkheader"
@@ -19,9 +52,18 @@
   revision = "6953a30d444317754766fccdd3f7f000edc874f6"
   version = "0.1.0"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom"
+  ]
+  revision = "1e491301e022f8f977054da4c2d852decd59571f"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "daeb8f554f091b609694a7b29fe84f0bdca60c6e7466cd2dc8109fe32036586c"
+  inputs-digest = "1e4a7d1a3ff92fe8f82ae40fadcb4117ce38b72bf187aee3033ec131e2e2877d"
   solver-name = "gps-cdcl"
   solver-version = 1
