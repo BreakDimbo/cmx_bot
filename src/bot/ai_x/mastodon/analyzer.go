@@ -11,6 +11,8 @@ import (
 	"time"
 	"unicode"
 
+	gomastodon "bot/go-mastodon"
+
 	"github.com/olivere/elastic"
 	"github.com/yanyiwu/gojieba"
 )
@@ -35,8 +37,20 @@ func DoAnalyzeDaily() string {
 	sTime := now.Add(-32 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	wfMap := calWordFrequency(totalToots)
-	extractKeyWord(3, wfMap)
-	return ""
+	wpairs := extractKeyWord(3, wfMap)
+	tootsCount := len(totalToots)
+	tpMap := tootsByPerson(totalToots)
+	activePersonNum := len(tpMap)
+	id, num := mostActivePerson(tpMap)
+	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
+	if err != nil {
+		log.Fatalf("get account with id: %s error", id, err)
+	}
+
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前三名：%s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n",
+		wpairs[0].key, wpairs[1].key, wpairs[2].key, tootsCount,
+		activePersonNum, account.Username, num)
+	return tootToPost
 }
 
 func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string]*indexStatus) {
@@ -124,4 +138,22 @@ func extractKeyWord(top int, wfMap map[string]int) (keywords []wordPair) {
 func generateWordCloud() (medisId string) {
 	// upload media
 	return ""
+}
+
+func tootsByPerson(totalToots map[string]*indexStatus) (tootsNumPersonMap map[string]int) {
+	tootsNumPersonMap = make(map[string]int)
+	for _, k := range totalToots {
+		tootsNumPersonMap[k.AccountId] += 1
+	}
+	return
+}
+
+func mostActivePerson(tpMap map[string]int) (id string, tootNum int) {
+	for k, v := range tpMap {
+		if v >= tootNum {
+			tootNum = v
+			id = k
+		}
+	}
+	return
 }

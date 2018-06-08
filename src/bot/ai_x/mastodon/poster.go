@@ -5,13 +5,12 @@ import (
 	"log"
 
 	mastodon "bot/go-mastodon"
-
-	"github.com/robfig/cron"
 )
 
 func post(c *mastodon.Client, toot string) {
 	_, err := c.PostStatus(context.Background(), &mastodon.Toot{
-		Status: toot,
+		Status:     toot,
+		Visibility: "private",
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -19,9 +18,12 @@ func post(c *mastodon.Client, toot string) {
 }
 
 func RunPoster(c *mastodon.Client) {
-	crontab := cron.New()
-	crontab.AddFunc("0 0 8 * * *", func() {
-		status := DoAnalyzeDaily()
-		post(c, status)
-	})
+	// crontab := cron.New()
+	// crontab.AddFunc("0 0 8 * * *", func() {
+	// 	status := DoAnalyzeDaily()
+	// 	post(c, status)
+	// })
+
+	status := DoAnalyzeDaily()
+	post(c, status)
 }

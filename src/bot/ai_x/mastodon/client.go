@@ -43,9 +43,6 @@ func Lauch() {
 
 	defer cancel()
 
-	// Test
-	DoAnalyzeDaily()
-
 	for event := range q {
 		switch event.(type) {
 		case *gomastodon.UpdateEvent:
