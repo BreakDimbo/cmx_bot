@@ -8,27 +8,31 @@ import (
 	"sync"
 
 	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/config"
 )
 
 var once sync.Once
 var err error
 var Client *elastic.Client
 
+const URL = "http://47.93.43.59:9201"
+
 func InitOnce() {
 	once.Do(func() {
-		Client, err = elastic.NewClient()
+		cfg := &config.Config{URL: URL, Username: "break", Password: "break12345"}
+		Client, err = elastic.NewClientFromConfig(cfg)
 		if err != nil {
 			log.Fatal(err)
 		}
 		// Ping the Elasticsearch server to get e.g. the version number
-		info, code, err := Client.Ping("http://127.0.0.1:9200").Do(context.Background())
+		info, code, err := Client.Ping(URL).Do(context.Background())
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
 
 		// Getting the ES version number is quite common, so there's a shortcut
-		esversion, err := Client.ElasticsearchVersion("http://127.0.0.1:9200")
+		esversion, err := Client.ElasticsearchVersion(URL)
 		if err != nil {
 			log.Fatal(err)
 		}
