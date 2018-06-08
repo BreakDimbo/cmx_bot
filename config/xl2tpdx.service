@@ -7,8 +7,8 @@ PermissionsStartOnly=true
 ; blank ExecStart= line flushes the list
 ExecStart=
 ExecStart=/usr/sbin/ipsec up myvpn
-ExecStartPost=echo "c myvpn" > /var/run/xl2tpd/l2tp-control
-ExecStartPost=route add default dev ppp0
+ExecStartPost=/bin/bash -c '/bin/echo "c myvpn" > /var/run/xl2tpd/l2tp-control'
+ExecStartPost=/sbin/route add default dev ppp0
 TimeoutSec=45s
 Restart=always
 ; exec
