@@ -32,7 +32,7 @@ type wordPair struct {
 
 func DoAnalyzeDaily() string {
 	now := time.Now().Add(-8 * time.Hour)
-	sTime := now.Add(-24 * time.Hour)
+	sTime := now.Add(-32 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	wfMap := calWordFrequency(totalToots)
 	extractKeyWord(3, wfMap)
