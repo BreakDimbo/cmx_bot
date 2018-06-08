@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/olivere/elastic"
+	"github.com/yanyiwu/gojieba"
 )
 
 /*
@@ -27,6 +28,7 @@ func DoAnalyzeDaily() string {
 	now := time.Now().Add(-8 * time.Hour)
 	sTime := now.Add(-24 * time.Hour)
 	fetchDataByTime(sTime, now)
+	calWordFrequency(10)
 	return ""
 }
 
@@ -59,6 +61,12 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) {
 }
 
 func calWordFrequency(limit int) (wFreMap map[string]int) {
+	x := gojieba.NewJieba()
+	defer x.Free()
+
+	s := "我是天才"
+	words = x.Cut(s, use_hmm)
+	fmt.Printf("analyze result: %s\n", words)
 	return nil
 }
 

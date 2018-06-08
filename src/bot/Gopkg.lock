@@ -53,6 +53,12 @@
   version = "0.1.0"
 
 [[projects]]
+  name = "github.com/yanyiwu/gojieba"
+  packages = ["."]
+  revision = "6e14c5c21cec8e7b26f319f3bcc3dddffacc703a"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
@@ -64,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1e4a7d1a3ff92fe8f82ae40fadcb4117ce38b72bf187aee3033ec131e2e2877d"
+  inputs-digest = "b6bcc89116f85d65dbef836fd255baec57460a68ac7d10b17863a1e2154b0cf0"
   solver-name = "gps-cdcl"
   solver-version = 1

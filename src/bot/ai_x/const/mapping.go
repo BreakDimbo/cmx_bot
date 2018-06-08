@@ -24,6 +24,8 @@ const StatusMapping = `
 				"content":{
 					"type":"text",
 					"store": true,
+					"analyzer": "ik_smart",
+          "search_analyzer": "ik_smart",
 					"fielddata": true
 				},
 				"reblogs_count":{
