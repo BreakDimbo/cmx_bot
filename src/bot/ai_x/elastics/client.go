@@ -19,7 +19,8 @@ const URL = "http://47.93.43.59:9201"
 
 func InitOnce() {
 	once.Do(func() {
-		cfg := &config.Config{URL: URL, Username: "elastic", Password: "break12345"}
+		t := false
+		cfg := &config.Config{URL: URL, Username: "elastic", Password: "break12345", Sniff: &t}
 		Client, err = elastic.NewClientFromConfig(cfg)
 		if err != nil {
 			log.Fatal(err)
