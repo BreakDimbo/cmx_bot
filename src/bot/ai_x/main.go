@@ -8,6 +8,7 @@ import (
 func main() {
 	elastics.InitOnce()
 	mastodon.InitOnce()
+	mastodon.LoadStopWord()
 	mastodon.Lauch()
 }
 
