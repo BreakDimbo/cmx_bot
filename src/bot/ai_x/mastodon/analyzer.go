@@ -50,6 +50,7 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string
 	searchResult, err := elastics.Client.Search().
 		Index("status").
 		Query(query).
+		Size(10000).
 		Pretty(true).
 		Do(context.Background())
 	if err != nil {
