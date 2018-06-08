@@ -1,6 +1,7 @@
 package mastodon
 
 import (
+	con "bot/ai_x/const"
 	"bot/ai_x/elastics"
 	"context"
 	"fmt"
@@ -22,20 +23,23 @@ weekly active user trend
 todo daily popular toot
 */
 
-var sResult map[string]*indexStatus
+type wordPair struct {
+	key   string
+	value int
+}
 
 func DoAnalyzeDaily() string {
 	now := time.Now().Add(-8 * time.Hour)
 	sTime := now.Add(-24 * time.Hour)
-	fetchDataByTime(sTime, now)
-	calWordFrequency(10)
+	totalToots := fetchDataByTime(sTime, now)
+	calWordFrequency(10, totalToots)
 	return ""
 }
 
-func fetchDataByTime(startTime time.Time, endTime time.Time) {
-	RFC3339local := "2006-01-02T15:04:05Z"
-	stStr := startTime.Format(RFC3339local)
-	edStr := endTime.Format(RFC3339local)
+func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string]*indexStatus) {
+
+	stStr := startTime.Format(con.RFC3339local)
+	edStr := endTime.Format(con.RFC3339local)
 	query := elastic.NewRangeQuery("created_at").
 		Gte(stStr).
 		Lte(edStr)
@@ -43,11 +47,11 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) {
 	searchResult, err := elastics.Client.Search().
 		Index("status").
 		Query(query).
-		Pretty(true).            // pretty print request and response JSON
-		Do(context.Background()) // execute
+		Pretty(true).
+		Do(context.Background())
 	if err != nil {
 		log.Fatalf("search error: %s", err)
-		return
+		return nil
 	}
 
 	var toot *indexStatus
@@ -58,16 +62,27 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) {
 	}
 
 	fmt.Printf("[DEBUG] fetch data by time result: %s\n", sResult)
+	return
 }
 
-func calWordFrequency(limit int) (wFreMap map[string]int) {
+func calWordFrequency(limit int, totalToots map[string]*indexStatus) (wFreMap map[string]int) {
 	x := gojieba.NewJieba()
 	defer x.Free()
+	use_hmm := true
+	wFreMap = make(map[string]int)
 
-	s := "我是天才"
-	words = x.Cut(s, use_hmm)
-	fmt.Printf("analyze result: %s\n", words)
-	return nil
+	for _, s := range totalToots {
+		words := x.Cut(s.Content, use_hmm)
+		for _, w := range words {
+			if len(w) <= con.SingleChineseByte {
+				continue
+			}
+			wFreMap[w] += 1
+		}
+	}
+
+	fmt.Printf("[DEBUG] calculate word frequency result: %s\n", wFreMap)
+	return
 }
 
 func generateWordCloud() (medisId string) {

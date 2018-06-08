@@ -10,11 +10,11 @@ import (
 	gomastodon "bot/go-mastodon"
 )
 
-var once sync.Once
 var wsClient *gomastodon.WSClient
 var client *gomastodon.Client
 
 func InitOnce() {
+	var once sync.Once
 	once.Do(func() {
 		c := gomastodon.NewClient(&gomastodon.Config{
 			Server:       con.Server,

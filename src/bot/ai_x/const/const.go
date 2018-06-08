@@ -7,3 +7,7 @@ const (
 	ClientEmail    = "rock.haok@gmail.com"
 	ClientPassword = "xbot12345678"
 )
+
+const RFC3339local = "2006-01-02T15:04:05Z"
+
+const SingleChineseByte = 3
