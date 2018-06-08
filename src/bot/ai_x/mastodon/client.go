@@ -32,7 +32,7 @@ func InitOnce() {
 }
 
 func Lauch() {
-	go RunPoster(client)
+	RunPoster(client)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := wsClient.StreamingWSPublic(ctx, true)
