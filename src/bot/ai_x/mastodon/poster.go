@@ -21,7 +21,7 @@ func post(c *mastodon.Client, toot string) {
 
 func RunPoster(c *mastodon.Client) {
 	crontab := cron.New()
-	crontab.AddFunc("0 0 8 * * *", func() {
+	crontab.AddFunc("0 42 20 * * *", func() {
 		status := DoAnalyzeDaily()
 		post(c, status)
 	})
