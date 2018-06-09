@@ -33,8 +33,8 @@ type wordPair struct {
 }
 
 func DoAnalyzeDaily() string {
-	now := time.Now().Add(-8 * time.Hour)
-	sTime := now.Add(-32 * time.Hour)
+	now := time.Now().Add(4 * time.Hour)
+	sTime := now.Add(-16 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(3, wfMap)
@@ -95,18 +95,19 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 		for _, w := range words {
 			if stopwords[w] {
 				continue
-			} else {
-				hasAlphabet := false
-				for _, r := range w {
-					if !unicode.Is(unicode.Scripts["Han"], r) {
-						hasAlphabet = true
-						break
-					}
-				}
-				if hasAlphabet {
-					continue
+			}
+
+			hasAlphabet := false
+			for _, r := range w {
+				if !unicode.Is(unicode.Scripts["Han"], r) {
+					hasAlphabet = true
+					break
 				}
 			}
+			if hasAlphabet {
+				continue
+			}
+
 			wFreMap[w] += 1
 		}
 	}

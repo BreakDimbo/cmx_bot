@@ -25,7 +25,8 @@ func LoadStopWord() {
 
 	wordsSlice := strings.Split(string(dat), "\n")
 	stopwords = make(map[string]bool)
-	for _, word := range wordsSlice {
+	for _, w := range wordsSlice {
+		word := strings.TrimSpace(w)
 		stopwords[word] = true
 	}
 }
