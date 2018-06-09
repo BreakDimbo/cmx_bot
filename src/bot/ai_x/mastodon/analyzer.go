@@ -93,9 +93,7 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 	for _, s := range totalToots {
 		words := x.Cut(s.Content, use_hmm)
 		for _, w := range words {
-			if len(w) <= con.SingleChineseByte {
-				continue
-			} else if stopwords[w] {
+			if stopwords[w] {
 				continue
 			} else {
 				hasAlphabet := false
