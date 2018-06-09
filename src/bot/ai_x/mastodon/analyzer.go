@@ -37,7 +37,7 @@ func DoAnalyzeDaily() string {
 	sTime := now.Add(-16 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	wfMap := calWordFrequency(totalToots)
-	wpairs := extractKeyWord(3, wfMap)
+	wpairs := extractKeyWord(20, wfMap)
 	tootsCount := len(totalToots)
 	tpMap := tootsByPerson(totalToots)
 	activePersonNum := len(tpMap)
@@ -47,8 +47,8 @@ func DoAnalyzeDaily() string {
 		log.Fatalf("get account with id: %s error", id, err)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前三名：%s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n",
-		wpairs[0].key, wpairs[1].key, wpairs[2].key, tootsCount,
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n",
+		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
 		activePersonNum, account.Username, num)
 	return tootToPost
 }
@@ -85,9 +85,6 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string
 
 func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]int) {
 	x := gojieba.NewJieba()
-	x.AddWord("摸鱼")
-	x.AddWord("网站")
-	x.AddWord("站内")
 	defer x.Free()
 	use_hmm := true
 	wFreMap = make(map[string]int)
