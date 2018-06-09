@@ -86,6 +86,8 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string
 func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]int) {
 	x := gojieba.NewJieba()
 	x.AddWord("摸鱼")
+	x.AddWord("网站")
+	x.AddWord("站内")
 	defer x.Free()
 	use_hmm := true
 	wFreMap = make(map[string]int)
