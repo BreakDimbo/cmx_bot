@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/BurntSushi/toml"
+  packages = ["."]
+  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
+  version = "v0.3.0"
+
+[[projects]]
   name = "github.com/gorilla/websocket"
   packages = ["."]
   revision = "ea4d1f681babbce9545c9c5f3d5194a789c89f5b"
@@ -64,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0a2036f78e67d156d071b327502da79780cc7e121d3c18b399ecbe6f1c047c86"
+  inputs-digest = "5eea39586e4c238b79c97f8ffb524ff35d9c0193460e3825d663e08c04116975"
   solver-name = "gps-cdcl"
   solver-version = 1

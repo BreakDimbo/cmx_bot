@@ -1,8 +1,10 @@
 package mastodon
 
 import (
+	"bot/ai_x/config"
 	"context"
 	"log"
+	"sync"
 
 	mastodon "bot/go-mastodon"
 
@@ -20,10 +22,14 @@ func post(c *mastodon.Client, toot string) {
 }
 
 func RunPoster(c *mastodon.Client) {
-	crontab := cron.New()
-	crontab.AddFunc("0 0 20 * * *", func() {
-		status := DoAnalyzeDaily()
-		post(c, status)
+	var once sync.Once
+	cronConfig := config.GetPostCron()
+	once.Do(func() {
+		crontab := cron.New()
+		crontab.AddFunc(cronConfig.ConTime, func() {
+			status := DailyAnalyze()
+			post(c, status)
+		})
+		crontab.Start()
 	})
-	crontab.Start()
 }

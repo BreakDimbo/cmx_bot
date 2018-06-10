@@ -1,7 +1,7 @@
 package mastodon
 
 import (
-	con "bot/ai_x/const"
+	"bot/ai_x/config"
 	"context"
 	"fmt"
 	"log"
@@ -13,15 +13,16 @@ import (
 var wsClient *gomastodon.WSClient
 var client *gomastodon.Client
 
-func InitOnce() {
+func init() {
 	var once sync.Once
 	once.Do(func() {
+		mci := config.GetMastodonClientInfo()
 		c := gomastodon.NewClient(&gomastodon.Config{
-			Server:       con.Server,
-			ClientID:     con.ClientId,
-			ClientSecret: con.ClientSecret,
+			Server:       mci.Sever,
+			ClientID:     mci.ID,
+			ClientSecret: mci.Secret,
 		})
-		err := c.Authenticate(context.Background(), con.ClientEmail, con.ClientPassword)
+		err := c.Authenticate(context.Background(), mci.Email, mci.Password)
 		if err != nil {
 			log.Fatal(err)
 		}

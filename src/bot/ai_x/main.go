@@ -1,13 +1,10 @@
 package main
 
 import (
-	"bot/ai_x/elastics"
 	"bot/ai_x/mastodon"
 )
 
 func main() {
-	elastics.InitOnce()
-	mastodon.InitOnce()
 	mastodon.LoadStopWord()
 	mastodon.Lauch()
 }

@@ -32,7 +32,7 @@ type wordPair struct {
 	value int
 }
 
-func DoAnalyzeDaily() string {
+func DailyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
 	sTime := now.Add(-16 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
@@ -54,7 +54,6 @@ func DoAnalyzeDaily() string {
 }
 
 func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string]*indexStatus) {
-
 	stStr := startTime.Format(con.RFC3339local)
 	edStr := endTime.Format(con.RFC3339local)
 	query := elastic.NewRangeQuery("created_at").
@@ -110,7 +109,6 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 			wFreMap[w] += 1
 		}
 	}
-
 	fmt.Printf("[DEBUG] calculate word frequency result: %s\n", wFreMap)
 	return
 }
