@@ -54,11 +54,11 @@ func Lauch() {
 		case uq := <-userq:
 			switch uq.(type) {
 			case *gomastodon.UpdateEvent:
-				e := uq.(*gomastodon.UpdateEvent)
-				HandleUpdate(e, con.ScopeTypeLocal)
+				// e := uq.(*gomastodon.UpdateEvent)
+				// HandleUpdate(e, con.ScopeTypeLocal)
 			case *gomastodon.DeleteEvent:
-				e := uq.(*gomastodon.DeleteEvent)
-				HandleDelete(e)
+				// e := uq.(*gomastodon.DeleteEvent)
+				// HandleDelete(e)
 			case *gomastodon.NotificationEvent:
 				e := uq.(*gomastodon.NotificationEvent)
 				HandleNotification(e)

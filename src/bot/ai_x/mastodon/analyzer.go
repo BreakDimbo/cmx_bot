@@ -36,10 +36,11 @@ func DailyAnalyze() string {
 	sTime := now.Add(-20 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	localToots := getLocalToots(totalToots)
-	wfMap := calWordFrequency(totalToots)
+	publicToots := getPublicToots(totalToots)
+	wfMap := calWordFrequency(publicToots)
 	wpairs := extractKeyWord(20, wfMap)
-	tootsCount := len(totalToots)
-	tpMap := tootsByPerson(totalToots)
+	tootsCount := len(publicToots)
+	tpMap := tootsByPerson(publicToots)
 	ltpMap := tootsByPerson(localToots)
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
@@ -49,7 +50,7 @@ func DailyAnalyze() string {
 	}
 
 	var hualao string
-	lid, lnum := mostActivePerson(ltpMap)
+	lid, _ := mostActivePerson(ltpMap)
 	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
 	if lerr != nil {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
@@ -58,9 +59,9 @@ func DailyAnalyze() string {
 		hualao = fmt.Sprintf("%s*%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s*%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n",
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s*%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
-		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
+		activePersonNum, account.DisplayName, account.Username, num, hualao)
 	return tootToPost
 }
 
@@ -69,10 +70,11 @@ func WeeklyAnalyze() string {
 	sTime := now.Add(-164 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	localToots := getLocalToots(totalToots)
-	wfMap := calWordFrequency(totalToots)
+	publicToots := getPublicToots(totalToots)
+	wfMap := calWordFrequency(publicToots)
 	wpairs := extractKeyWord(20, wfMap)
-	tootsCount := len(totalToots)
-	tpMap := tootsByPerson(totalToots)
+	tootsCount := len(publicToots)
+	tpMap := tootsByPerson(publicToots)
 	ltpMap := tootsByPerson(localToots)
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
@@ -129,6 +131,17 @@ func getLocalToots(toots map[string]*indexStatus) (ltoots map[string]*indexStatu
 
 	for k, v := range toots {
 		if v.Scope == con.ScopeTypeLocal {
+			ltoots[k] = v
+		}
+	}
+	return
+}
+
+func getPublicToots(toots map[string]*indexStatus) (ltoots map[string]*indexStatus) {
+	ltoots = make(map[string]*indexStatus)
+
+	for k, v := range toots {
+		if v.Scope != con.ScopeTypeLocal {
 			ltoots[k] = v
 		}
 	}
