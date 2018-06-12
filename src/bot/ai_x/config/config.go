@@ -40,12 +40,14 @@ type mastodonClientInfo struct {
 }
 
 func init() {
-	runingEnv := flag.String("evn", "development", "running env")
+	runingEnv := flag.String("env", "development", "running env")
 	rootedPath, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+	flag.Parse()
+	fmt.Printf("Running in %s env\n", *runingEnv)
 	configPath := fmt.Sprintf("%s/config/%s.toml", rootedPath, *runingEnv)
 
 	dat, err := ioutil.ReadFile(configPath)
