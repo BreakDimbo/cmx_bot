@@ -63,7 +63,7 @@ func Lauch() {
 				e := uq.(*gomastodon.NotificationEvent)
 				HandleNotification(e)
 			default:
-				fmt.Println(uq)
+				fmt.Printf("other event: %s\n", uq)
 			}
 
 		case pq := <-q:
@@ -75,7 +75,7 @@ func Lauch() {
 				e := pq.(*gomastodon.DeleteEvent)
 				HandleDelete(e)
 			default:
-				fmt.Println(pq)
+				fmt.Printf("other event: %s\n", pq)
 			}
 		}
 	}
