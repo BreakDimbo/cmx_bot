@@ -15,7 +15,7 @@ var config tomlConfig
 type tomlConfig struct {
 	Title       string
 	Ela         elastic            `toml:"elastic"`
-	PostCron    postCron           `toml:"post_crontab"`
+	PostConfig  postConifg         `toml:"post_config"`
 	MClientInfo mastodonClientInfo `toml:"mastodon_client_info"`
 }
 
@@ -25,8 +25,10 @@ type elastic struct {
 	Password string
 }
 
-type postCron struct {
-	ConTime string `toml:"cron_time"`
+type postConifg struct {
+	DailyTime  string `toml:"daily_cron_time"`
+	WeeklyTime string `toml:"weekly_cron_time"`
+	Scope      string
 }
 
 type mastodonClientInfo struct {
@@ -38,7 +40,7 @@ type mastodonClientInfo struct {
 }
 
 func init() {
-	runingEnv := flag.String("evn", "production", "running env")
+	runingEnv := flag.String("evn", "development", "running env")
 	rootedPath, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -61,8 +63,8 @@ func GetElastic() elastic {
 	return config.Ela
 }
 
-func GetPostCron() postCron {
-	return config.PostCron
+func GetPostConfig() postConifg {
+	return config.PostConfig
 }
 
 func GetMastodonClientInfo() mastodonClientInfo {

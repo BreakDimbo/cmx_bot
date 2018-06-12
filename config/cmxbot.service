@@ -6,7 +6,7 @@ After=syslog.target network.target local-fs.target
 PermissionsStartOnly=true
 ; blank ExecStart= line flushes the list
 ExecStart=
-ExecStart=/usr/local/cmx_bot/current/bin/bot
+ExecStart=/usr/local/cmx_bot/current/bin/bot -env production
 TimeoutSec=45s
 Restart=always
 ; exec

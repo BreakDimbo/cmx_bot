@@ -34,7 +34,7 @@ type wordPair struct {
 
 func DailyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
-	sTime := now.Add(-16 * time.Hour)
+	sTime := now.Add(-20 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(20, wfMap)
@@ -48,6 +48,27 @@ func DailyAnalyze() string {
 	}
 
 	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n",
+		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
+		activePersonNum, account.Username, num)
+	return tootToPost
+}
+
+func WeeklyAnalyze() string {
+	now := time.Now().Add(4 * time.Hour)
+	sTime := now.Add(-164 * time.Hour)
+	totalToots := fetchDataByTime(sTime, now)
+	wfMap := calWordFrequency(totalToots)
+	wpairs := extractKeyWord(20, wfMap)
+	tootsCount := len(totalToots)
+	tpMap := tootsByPerson(totalToots)
+	activePersonNum := len(tpMap)
+	id, num := mostActivePerson(tpMap)
+	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
+	if err != nil {
+		log.Fatalf("get account with id: %s error", id, err)
+	}
+
+	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s | %s | %s | %s | %s\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s, 共嘟嘟了%d条\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
 		activePersonNum, account.Username, num)
 	return tootToPost
