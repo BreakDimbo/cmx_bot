@@ -48,19 +48,19 @@ func DailyAnalyze() string {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
 	}
 
-	var displayName string
+	var hualao string
 	lid, lnum := mostActivePerson(ltpMap)
 	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
 	if lerr != nil {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
-		displayName = "无"
+		hualao = "无"
 	} else {
-		displayName = laccount.DisplayName
+		hualao = fmt.Sprintf("%s*%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n",
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s*%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
-		activePersonNum, account.DisplayName, num, displayName, lnum)
+		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
 	return tootToPost
 }
 
@@ -81,15 +81,19 @@ func WeeklyAnalyze() string {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
 	}
 
+	var hualao string
 	lid, lnum := mostActivePerson(ltpMap)
 	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
 	if lerr != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
+		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
+		hualao = "无"
+	} else {
+		hualao = fmt.Sprintf("%s*%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s | %s | %s | %s | %s\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
+	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s | %s | %s | %s | %s\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s*%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
-		activePersonNum, account.DisplayName, num, laccount.DisplayName, lnum)
+		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
 	return tootToPost
 }
 
