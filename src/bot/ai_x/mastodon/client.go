@@ -58,7 +58,7 @@ func Lauch() {
 				HandleUpdate(e, con.ScopeTypeLocal)
 			case *gomastodon.DeleteEvent:
 				e := uq.(*gomastodon.DeleteEvent)
-				HandleDelete(e)
+				HandleDelete(e, con.ScopeTypeLocal)
 			case *gomastodon.NotificationEvent:
 				e := uq.(*gomastodon.NotificationEvent)
 				HandleNotification(e)
@@ -73,7 +73,7 @@ func Lauch() {
 				HandleUpdate(e, con.ScopeTypePublic)
 			case *gomastodon.DeleteEvent:
 				e := pq.(*gomastodon.DeleteEvent)
-				HandleDelete(e)
+				HandleDelete(e, con.ScopeTypePublic)
 			default:
 				fmt.Printf("other event: %s\n", pq)
 			}

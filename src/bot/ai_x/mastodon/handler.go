@@ -34,13 +34,17 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 		Sensitive:       e.Status.Sensitive,
 	}
 
-	if scope == con.ScopeTypeLocal {
-		indexS.Scope = scope
+	var index string
+	switch scope {
+	case con.ScopeTypeLocal:
+		index = "local"
+	case con.ScopeTypePublic:
+		index = "status"
 	}
 
 	ctx := context.Background()
 	p, err := elastics.Client.Index().
-		Index("status").
+		Index(index).
 		Type("status").
 		Id(indexS.ID).
 		BodyJson(indexS).
@@ -51,9 +55,17 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 	fmt.Printf("Indexed status %s to index %s, type %s, scope %s\n", p.Id, p.Index, p.Type, scope)
 }
 
-func HandleDelete(e *gomastodon.DeleteEvent) {
+func HandleDelete(e *gomastodon.DeleteEvent, scope string) {
+	var index string
+	switch scope {
+	case con.ScopeTypeLocal:
+		index = "local"
+	case con.ScopeTypePublic:
+		index = "status"
+	}
+
 	ctx := context.Background()
-	_, err := elastics.Client.Delete().Index("status").Type("status").Id(e.ID).Do(ctx)
+	_, err := elastics.Client.Delete().Index(index).Type("status").Id(e.ID).Do(ctx)
 	if err != nil {
 		fmt.Printf("[ERROR] delete from es error: %s\n", err)
 		return

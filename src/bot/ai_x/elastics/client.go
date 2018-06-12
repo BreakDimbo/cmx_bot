@@ -56,5 +56,22 @@ func init() {
 				log.Println("createIndex not acknowledged")
 			}
 		}
+
+		// Use the IndexExists service to check if a specified index exists.
+		lexists, lerr := Client.IndexExists("local").Do(context.Background())
+		if lerr != nil {
+			log.Fatal(lerr)
+		}
+		if !lexists {
+			// create mapping
+			createIndex, err := Client.CreateIndex("local").Body(con.StatusMapping).Do(context.Background())
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if !createIndex.Acknowledged {
+				log.Println("createIndex not acknowledged")
+			}
+		}
 	})
 }

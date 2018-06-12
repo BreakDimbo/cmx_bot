@@ -34,8 +34,8 @@ type wordPair struct {
 func DailyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
 	sTime := now.Add(-20 * time.Hour)
-	totalToots := fetchDataByTime(sTime, now)
-	localToots := getLocalToots(totalToots)
+	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
+	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
 	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(20, wfMap)
 	tootsCount := len(totalToots)
@@ -67,8 +67,8 @@ func DailyAnalyze() string {
 func WeeklyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
 	sTime := now.Add(-164 * time.Hour)
-	totalToots := fetchDataByTime(sTime, now)
-	localToots := getLocalToots(totalToots)
+	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
+	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
 	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(20, wfMap)
 	tootsCount := len(totalToots)
@@ -97,15 +97,22 @@ func WeeklyAnalyze() string {
 	return tootToPost
 }
 
-func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string]*indexStatus) {
+func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sResult map[string]*indexStatus) {
 	stStr := startTime.Format(con.RFC3339local)
 	edStr := endTime.Format(con.RFC3339local)
+	var index string
+	switch scope {
+	case con.ScopeTypeLocal:
+		index = "local"
+	case con.ScopeTypePublic:
+		index = "status"
+	}
 	query := elastic.NewRangeQuery("created_at").
 		Gte(stStr).
 		Lte(edStr)
 
 	searchResult, err := elastics.Client.Search().
-		Index("status").
+		Index(index).
 		Query(query).
 		Size(10000).
 		Pretty(true).
