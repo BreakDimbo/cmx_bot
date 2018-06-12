@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bot/ai_x/crontab"
 	"bot/ai_x/mastodon"
 )
 
 func main() {
 	mastodon.LoadStopWord()
+	crontab.Start()
 	mastodon.Lauch()
 }
 

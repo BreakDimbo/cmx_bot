@@ -26,9 +26,10 @@ type elastic struct {
 }
 
 type postConifg struct {
-	DailyTime  string `toml:"daily_cron_time"`
-	WeeklyTime string `toml:"weekly_cron_time"`
-	Scope      string
+	DailyTime       string `toml:"daily_cron_time"`
+	WeeklyTime      string `toml:"weekly_cron_time"`
+	CleanUnfollower string `toml:"clean_unfollowers_time"`
+	Scope           string
 }
 
 type mastodonClientInfo struct {

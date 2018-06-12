@@ -5,7 +5,6 @@ import (
 	"bot/ai_x/elastics"
 	"context"
 	"fmt"
-	"log"
 	"reflect"
 	"sort"
 	"time"
@@ -36,20 +35,27 @@ func DailyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
 	sTime := now.Add(-20 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
+	localToots := getLocalToots(totalToots)
 	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(20, wfMap)
 	tootsCount := len(totalToots)
 	tpMap := tootsByPerson(totalToots)
+	ltpMap := tootsByPerson(localToots)
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
 	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
 	if err != nil {
-		log.Fatalf("get account with id: %s error", id, err)
+		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
+	}
+	lid, lnum := mostActivePerson(ltpMap)
+	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
+	if lerr != nil {
+		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n",
+	tootToPost := fmt.Sprintf("1.昨日草莓县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日草莓县嘟嘟数：%d\n 3.昨日草莓县冒泡人数：%d\n 4.昨日最活跃县民：%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
-		activePersonNum, account.Username, num)
+		activePersonNum, account.DisplayName, num, laccount.DisplayName, lnum)
 	return tootToPost
 }
 
@@ -57,20 +63,28 @@ func WeeklyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
 	sTime := now.Add(-164 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
+	localToots := getLocalToots(totalToots)
 	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(20, wfMap)
 	tootsCount := len(totalToots)
 	tpMap := tootsByPerson(totalToots)
+	ltpMap := tootsByPerson(localToots)
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
 	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
 	if err != nil {
-		log.Fatalf("get account with id: %s error", id, err)
+		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
 	}
 
-	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s | %s | %s | %s | %s\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s, 共嘟嘟了%d条\n",
+	lid, lnum := mostActivePerson(ltpMap)
+	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
+	if lerr != nil {
+		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
+	}
+
+	tootToPost := fmt.Sprintf("1.上周草莓县关键词前五名：%s | %s | %s | %s | %s\n 2.上周草莓县嘟嘟数：%d\n 3.上周草莓县冒泡人数：%d\n 4.上周最活跃县民：%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
-		activePersonNum, account.Username, num)
+		activePersonNum, account.DisplayName, num, laccount.DisplayName, lnum)
 	return tootToPost
 }
 
@@ -88,7 +102,7 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string
 		Pretty(true).
 		Do(context.Background())
 	if err != nil {
-		log.Fatalf("search error: %s", err)
+		fmt.Printf("[ERROR]:search error: %s\n", err)
 		return nil
 	}
 
@@ -98,8 +112,17 @@ func fetchDataByTime(startTime time.Time, endTime time.Time) (sResult map[string
 		t := item.(*indexStatus)
 		sResult[t.ID] = t
 	}
+	return
+}
 
-	fmt.Printf("[DEBUG] fetch data by time result: %s\n", sResult)
+func getLocalToots(toots map[string]*indexStatus) (ltoots map[string]*indexStatus) {
+	ltoots = make(map[string]*indexStatus)
+
+	for k, v := range toots {
+		if v.Scope == con.ScopeTypeLocal {
+			ltoots[k] = v
+		}
+	}
 	return
 }
 
@@ -130,7 +153,6 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 			wFreMap[w] += 1
 		}
 	}
-	fmt.Printf("[DEBUG] calculate word frequency result: %s\n", wFreMap)
 	return
 }
 

@@ -2,6 +2,7 @@ package mastodon
 
 import (
 	"bot/ai_x/config"
+	"bot/ai_x/const"
 	"context"
 	"fmt"
 	"log"
@@ -33,8 +34,6 @@ func init() {
 }
 
 func Lauch() {
-	RunPoster(client)
-
 	ctx, cancel := context.WithCancel(context.Background())
 	q, err := wsClient.StreamingWSPublic(ctx, true)
 	if err != nil {
@@ -42,21 +41,42 @@ func Lauch() {
 		cancel()
 	}
 
+	userq, err := wsClient.StreamingWSUser(ctx)
+	if err != nil {
+		log.Fatal(err)
+		cancel()
+	}
+
 	defer cancel()
 
-	for event := range q {
-		switch event.(type) {
-		case *gomastodon.UpdateEvent:
-			e := event.(*gomastodon.UpdateEvent)
-			HandleUpdate(e)
-		case *gomastodon.DeleteEvent:
-			e := event.(*gomastodon.DeleteEvent)
-			HandleDelete(e)
-		case *gomastodon.NotificationEvent:
-			e := event.(*gomastodon.NotificationEvent)
-			fmt.Println(e.Notification.Type)
-		default:
-			fmt.Println(event)
+	for {
+		select {
+		case uq := <-userq:
+			switch uq.(type) {
+			case *gomastodon.UpdateEvent:
+				e := uq.(*gomastodon.UpdateEvent)
+				HandleUpdate(e, con.ScopeTypeLocal)
+			case *gomastodon.DeleteEvent:
+				e := uq.(*gomastodon.DeleteEvent)
+				HandleDelete(e)
+			case *gomastodon.NotificationEvent:
+				e := uq.(*gomastodon.NotificationEvent)
+				HandleNotification(e)
+			default:
+				fmt.Println(uq)
+			}
+
+		case pq := <-q:
+			switch pq.(type) {
+			case *gomastodon.UpdateEvent:
+				e := pq.(*gomastodon.UpdateEvent)
+				HandleUpdate(e, con.ScopeTypePublic)
+			case *gomastodon.DeleteEvent:
+				e := pq.(*gomastodon.DeleteEvent)
+				HandleDelete(e)
+			default:
+				fmt.Println(pq)
+			}
 		}
 	}
 }
