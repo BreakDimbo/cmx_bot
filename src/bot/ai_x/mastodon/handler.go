@@ -34,7 +34,7 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 		Sensitive:       e.Status.Sensitive,
 	}
 
-	if scope == con.ScopeTypePublic {
+	if scope == con.ScopeTypeLocal {
 		indexS.Scope = scope
 	}
 
