@@ -14,7 +14,7 @@ import (
 func post(c *mastodon.Client, toot string) {
 	_, err := c.PostStatus(context.Background(), &mastodon.Toot{
 		Status:     toot,
-		Visibility: "private",
+		Visibility: "public",
 	})
 	if err != nil {
 		log.Fatal(err)
