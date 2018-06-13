@@ -55,10 +55,10 @@ func DailyAnalyze() string {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
 		hualao = "无"
 	} else {
-		hualao = fmt.Sprintf("%s@%s", laccount.DisplayName, laccount.Username)
+		hualao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s@%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n",
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s·%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n 6.(插播一条) 本县入住传火局局长 @firebot\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
 		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
 	return tootToPost
