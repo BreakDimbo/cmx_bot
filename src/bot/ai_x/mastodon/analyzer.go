@@ -35,13 +35,13 @@ func DailyAnalyze() string {
 	now := time.Now().Add(4 * time.Hour)
 	sTime := now.Add(-20 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
-	localToots := getLocalToots(totalToots)
+
 	publicToots := getPublicToots(totalToots)
 	wfMap := calWordFrequency(publicToots)
 	wpairs := extractKeyWord(20, wfMap)
 	tootsCount := len(publicToots)
 	tpMap := tootsByPerson(publicToots)
-	ltpMap := tootsByPerson(localToots)
+
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
 	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
@@ -49,15 +49,7 @@ func DailyAnalyze() string {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
 	}
 
-	var hualao string
-	lid, _ := mostActivePerson(ltpMap)
-	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
-	if lerr != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
-		hualao = "无"
-	} else {
-		hualao = fmt.Sprintf("%s*%s", laccount.DisplayName, laccount.Username)
-	}
+	hualao := fmt.Sprintf("%s*%s", account.DisplayName, account.Username)
 
 	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s | %s | %s | %s | %s\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s*%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s\n",
 		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
