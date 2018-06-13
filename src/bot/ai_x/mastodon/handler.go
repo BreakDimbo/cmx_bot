@@ -51,6 +51,8 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 		Do(ctx)
 	if err != nil {
 		fmt.Printf("[ERROR] update to es error: %s/n", err)
+		// TODO: retry
+		return
 	}
 	fmt.Printf("Indexed status %s to index %s, type %s, scope %s\n", p.Id, p.Index, p.Type, scope)
 }
@@ -68,6 +70,7 @@ func HandleDelete(e *gomastodon.DeleteEvent, scope string) {
 	_, err := elastics.Client.Delete().Index(index).Type("status").Id(e.ID).Do(ctx)
 	if err != nil {
 		fmt.Printf("[ERROR] delete from es error: %s\n", err)
+		// TODO: retry
 		return
 	}
 	fmt.Printf("delete from es ok with id: %s\n", e.ID)

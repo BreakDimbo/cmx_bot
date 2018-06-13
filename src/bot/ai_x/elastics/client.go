@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/olivere/elastic"
-	econfig "github.com/olivere/elastic/config"
 )
 
 var Client *elastic.Client
@@ -19,24 +18,29 @@ func init() {
 	var err error
 
 	once.Do(func() {
-		t := false
 		e := config.GetElastic()
-		cfg := &econfig.Config{URL: e.Url, Username: e.Username, Password: e.Password, Sniff: &t}
-		Client, err = elastic.NewClientFromConfig(cfg)
+		Client, err = elastic.NewClient(elastic.SetBasicAuth(e.Username, e.Password),
+			elastic.SetURL(e.Url),
+			elastic.SetSniff(false),
+			elastic.SetRetrier(NewMyRetrier()),
+		)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("[ERROR] new es client error: %s", err)
+			return
 		}
 		// Ping the Elasticsearch server to get e.g. the version number
 		info, code, err := Client.Ping(e.Url).Do(context.Background())
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("[ERROR] ping es error: %s", err)
+			return
 		}
 		fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
 
 		// Getting the ES version number is quite common, so there's a shortcut
 		esversion, err := Client.ElasticsearchVersion(e.Url)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("[ERROR] get es version error: %s", err)
+			return
 		}
 		fmt.Printf("Elasticsearch version %s\n", esversion)
 
