@@ -69,7 +69,7 @@ func HandleDelete(e *gomastodon.DeleteEvent, scope string) {
 	ctx := context.Background()
 	_, err := elastics.Client.Delete().Index(index).Type("status").Id(e.ID).Do(ctx)
 	if err != nil {
-		fmt.Printf("[ERROR] delete from es error: %s\n", err)
+		fmt.Printf("[ERROR] delete %s from es error: %s\n", e.ID, err)
 		// TODO: retry
 		return
 	}
