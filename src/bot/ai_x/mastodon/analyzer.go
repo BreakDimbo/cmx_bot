@@ -36,11 +36,10 @@ func DailyAnalyze() string {
 	sTime := now.Add(-20 * time.Hour)
 	totalToots := fetchDataByTime(sTime, now)
 
-	publicToots := getPublicToots(totalToots)
-	wfMap := calWordFrequency(publicToots)
+	wfMap := calWordFrequency(totalToots)
 	wpairs := extractKeyWord(20, wfMap)
-	tootsCount := len(publicToots)
-	tpMap := tootsByPerson(publicToots)
+	tootsCount := len(totalToots)
+	tpMap := tootsByPerson(totalToots)
 
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
