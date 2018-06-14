@@ -13,10 +13,11 @@ import (
 var config tomlConfig
 
 type tomlConfig struct {
-	Title       string
-	Ela         elastic            `toml:"elastic"`
-	PostConfig  postConifg         `toml:"post_config"`
-	MClientInfo mastodonClientInfo `toml:"mastodon_client_info"`
+	Title           string
+	Ela             elastic            `toml:"elastic"`
+	PostConfig      postConifg         `toml:"post_config"`
+	MClientInfo     mastodonClientInfo `toml:"mastodon_client_info"`
+	FBotMClientInfo mastodonClientInfo `toml:"firebot"`
 }
 
 type elastic struct {
@@ -72,4 +73,8 @@ func GetPostConfig() postConifg {
 
 func GetMastodonClientInfo() mastodonClientInfo {
 	return config.MClientInfo
+}
+
+func GetFBotMClientInfo() mastodonClientInfo {
+	return config.FBotMClientInfo
 }

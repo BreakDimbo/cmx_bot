@@ -1,8 +1,8 @@
 package elastics
 
 import (
-	"bot/ai_x/config"
 	con "bot/ai_x/const"
+	"bot/config"
 	"context"
 	"fmt"
 	"log"

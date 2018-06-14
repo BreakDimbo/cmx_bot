@@ -2,10 +2,9 @@ package mastodon
 
 import (
 	"bot/config"
-	"context"
-	"log"
-
 	mastodon "bot/go-mastodon"
+	"context"
+	"fmt"
 )
 
 func post(toot string) {
@@ -15,16 +14,7 @@ func post(toot string) {
 		Visibility: pc.Scope,
 	})
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("[ERROR]: post error: %s", err)
+		return
 	}
-}
-
-func DailyPost() {
-	status := DailyAnalyze()
-	post(status)
-}
-
-func WeeklyPost() {
-	status := WeeklyAnalyze()
-	post(status)
 }

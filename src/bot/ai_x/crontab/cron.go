@@ -1,8 +1,8 @@
 package crontab
 
 import (
-	"bot/ai_x/config"
 	"bot/ai_x/mastodon"
+	"bot/config"
 	"sync"
 
 	"github.com/robfig/cron"

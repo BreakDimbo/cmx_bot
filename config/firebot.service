@@ -1,0 +1,19 @@
+[Unit]
+Description=firebot
+After=syslog.target network.target local-fs.target
+
+[Service]
+PermissionsStartOnly=true
+; blank ExecStart= line flushes the list
+ExecStart=
+ExecStart=/usr/local/cmx_bot/current/bin/fbot -env=production
+TimeoutSec=45s
+Restart=always
+; exec
+WorkingDirectory=/usr/local/cmx_bot/current/
+User=break
+Group=break
+UMask=0022
+
+[Install]
+WantedBy=multi-user.target

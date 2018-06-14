@@ -57,9 +57,9 @@ func (c *Client) GetFavourites(ctx context.Context, pg *Pagination) ([]*Status, 
 }
 
 // GetStatus return status specified by id.
-func (c *Client) GetStatus(ctx context.Context, id int64) (*Status, error) {
+func (c *Client) GetStatus(ctx context.Context, id string) (*Status, error) {
 	var status Status
-	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%d", id), nil, &status, nil)
+	err := c.doAPI(ctx, http.MethodGet, fmt.Sprintf("/api/v1/statuses/%s", id), nil, &status, nil)
 	if err != nil {
 		return nil, err
 	}

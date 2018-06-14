@@ -4,6 +4,10 @@ bot:
 	@echo "Building CmxBot ..."
 	go build -o bin/bot bot/ai_x
 
+fbot:
+	@echo "Building FirtBot ..."
+	go build -o bin/fbot bot/firebot
+
 deps:
 	@echo "Install Installing dependencies"
 	@go get -u github.com/golang/dep/cmd/dep
