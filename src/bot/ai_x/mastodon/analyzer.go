@@ -27,7 +27,7 @@ weekly active user trend
 todo daily popular toot
 */
 
-type wordPair struct {
+type kvPair struct {
 	key   string
 	value int
 }
@@ -39,15 +39,23 @@ func DailyAnalyze() string {
 	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
 	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
 	wfMap := calWordFrequency(totalToots)
-	wpairs := extractKeyWord(20, wfMap)
+	wpairs := topN(20, wfMap)
 	tootsCount := len(totalToots)
 	tpMap := tootsByPerson(totalToots)
 	ltpMap := tootsByPerson(localToots)
 	activePersonNum := len(tpMap)
-	id, num := mostActivePerson(tpMap)
-	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
-	if err != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
+	tpSlice := topN(3, tpMap)
+	var topAccounts []*kvPair
+	for _, v := range tpSlice {
+		account, err := client.GetAccount(context.Background(), gomastodon.ID(v.key))
+		if err != nil {
+			fmt.Printf("[ERROR] get account with id: %s error: %s\n", v.key, err)
+			tpaccount := &kvPair{key: "无", value: v.value}
+			topAccounts = append(topAccounts, tpaccount)
+			continue
+		}
+		name := fmt.Sprintf("%s·%s", account.DisplayName, account.Username)
+		topAccounts = append(topAccounts, &kvPair{key: name, value: v.value})
 	}
 
 	var hualao string
@@ -60,9 +68,9 @@ func DailyAnalyze() string {
 		hualao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s·%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n 6.局长联动：本县入住传火局局长 @%s\n",
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n2.昨日本县嘟嘟数：%d\n3.昨日本县冒泡人数：%d\n4.昨日最活跃县民榜：\n(^з^)-☆ %s, 共嘟嘟了%d条\n(^з^)-☆ %s, 共嘟嘟了%d条\n(^з^)-☆ %s, 共嘟嘟了%d条\n5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n6.局长联动：本县入住传火局局长 @%s\n",
 		wpairs[0].key, wpairs[0].value, wpairs[1].key, wpairs[1].value, wpairs[2].key, wpairs[2].value, wpairs[3].key, wpairs[3].value, wpairs[4].key, wpairs[4].value, tootsCount,
-		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum, cf.Fbot)
+		activePersonNum, topAccounts[0].key, topAccounts[0].value, topAccounts[1].key, topAccounts[1].value, topAccounts[2].key, topAccounts[2].value, hualao, lnum, cf.Fbot)
 	return tootToPost
 }
 
@@ -72,7 +80,7 @@ func WeeklyAnalyze() string {
 	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
 	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
 	wfMap := calWordFrequency(totalToots)
-	wpairs := extractKeyWord(20, wfMap)
+	wpairs := topN(20, wfMap)
 	tootsCount := len(totalToots)
 	tpMap := tootsByPerson(totalToots)
 	ltpMap := tootsByPerson(localToots)
@@ -93,8 +101,8 @@ func WeeklyAnalyze() string {
 		hualao = fmt.Sprintf("%s@%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s | %s | %s | %s | %s\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s@%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
-		wpairs[0].key, wpairs[1].key, wpairs[2].key, wpairs[3].key, wpairs[4].key, tootsCount,
+	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s@%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
+		wpairs[0].key, wpairs[0].value, wpairs[1].key, wpairs[1].value, wpairs[2].key, wpairs[2].value, wpairs[3].key, wpairs[3].value, wpairs[4].key, wpairs[4].value, tootsCount,
 		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
 	return tootToPost
 }
@@ -133,17 +141,6 @@ func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sRes
 	return
 }
 
-func getLocalToots(toots map[string]*indexStatus) (ltoots map[string]*indexStatus) {
-	ltoots = make(map[string]*indexStatus)
-
-	for k, v := range toots {
-		if v.Scope == con.ScopeTypeLocal {
-			ltoots[k] = v
-		}
-	}
-	return
-}
-
 func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]int) {
 	x := gojieba.NewJieba()
 	defer x.Free()
@@ -174,21 +171,21 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 	return
 }
 
-func extractKeyWord(top int, wfMap map[string]int) (keywords []wordPair) {
-	wfMapLen := len(wfMap)
-	keywords = make([]wordPair, wfMapLen)
-	for k, v := range wfMap {
-		keywords = append(keywords, wordPair{key: k, value: v})
+func topN(top int, m map[string]int) (pair []kvPair) {
+	mlen := len(m)
+	pair = make([]kvPair, mlen)
+	for k, v := range m {
+		pair = append(pair, kvPair{key: k, value: v})
 	}
-	sort.Slice(keywords, func(i, j int) bool {
-		return keywords[i].value > keywords[j].value
+	sort.Slice(pair, func(i, j int) bool {
+		return pair[i].value > pair[j].value
 	})
-	if top > wfMapLen {
-		keywords = keywords[:wfMapLen]
+	if top > mlen {
+		pair = pair[:mlen]
 	} else {
-		keywords = keywords[:top]
+		pair = pair[:top]
 	}
-	fmt.Printf("[DEBUG] keywords result: %s\n", keywords)
+	fmt.Printf("[DEBUG] top n results: %s\n", pair)
 	return
 }
 
