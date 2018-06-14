@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -34,11 +35,13 @@ type postConifg struct {
 }
 
 type mastodonClientInfo struct {
-	ID       string `toml:"client_id"`
-	Secret   string `toml:"client_secret"`
-	Sever    string `toml:"server"`
-	Email    string `toml:"client_email"`
-	Password string `toml:"client_password"`
+	ID       string        `toml:"client_id"`
+	Secret   string        `toml:"client_secret"`
+	Sever    string        `toml:"server"`
+	Email    string        `toml:"client_email"`
+	Password string        `toml:"client_password"`
+	Timezone time.Duration `toml:"timezone"`
+	Fbot     string        `toml:"fbot"`
 }
 
 func init() {

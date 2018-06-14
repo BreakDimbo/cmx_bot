@@ -3,6 +3,7 @@ package mastodon
 import (
 	con "bot/ai_x/const"
 	"bot/ai_x/elastics"
+	"bot/config"
 	"context"
 	"fmt"
 	"reflect"
@@ -32,8 +33,9 @@ type wordPair struct {
 }
 
 func DailyAnalyze() string {
-	now := time.Now().Add(4 * time.Hour)
-	sTime := now.Add(-20 * time.Hour)
+	cf := config.GetMastodonClientInfo()
+	now := time.Now().Add(cf.Timezone * time.Hour)
+	sTime := now.Add((-24 + cf.Timezone) * time.Hour)
 	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
 	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
 	wfMap := calWordFrequency(totalToots)
@@ -58,9 +60,9 @@ func DailyAnalyze() string {
 		hualao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
 	}
 
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s·%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n 6.局长联动：本县入住传火局局长 @fbot\n",
+	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n 2.昨日本县嘟嘟数：%d\n 3.昨日本县冒泡人数：%d\n 4.昨日最活跃县民：%s·%s, 共嘟嘟了%d条\n 5.昨日局长眼中话唠：%s, 共嘟嘟了%d条\n 6.局长联动：本县入住传火局局长 @%s\n",
 		wpairs[0].key, wpairs[0].value, wpairs[1].key, wpairs[1].value, wpairs[2].key, wpairs[2].value, wpairs[3].key, wpairs[3].value, wpairs[4].key, wpairs[4].value, tootsCount,
-		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
+		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum, cf.Fbot)
 	return tootToPost
 }
 
