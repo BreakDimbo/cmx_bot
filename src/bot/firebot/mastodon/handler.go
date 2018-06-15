@@ -10,18 +10,27 @@ import (
 )
 
 func HandleNotification(e *gomastodon.NotificationEvent) {
+	var tootToPost string
 	switch e.Notification.Type {
 	case "mention":
 		n := e.Notification
 		fromUser := n.Account
 		toot := n.Status
 		firstContent := filter(toot.Content)
-		content := recurToot(n.Status.InReplyToID)
-		tootToPost := fmt.Sprintf("@%s:%s// %s", fromUser.Username, firstContent, content)
-		tootToPost = strings.TrimSuffix(tootToPost, "// ")
+		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
+			index := strings.Index(firstContent, "县民榜：\n")
+			tootToPost = firstContent[index+12:]
+			lastIndex := strings.Index(tootToPost, "条\n")
+			tootToPost = fmt.Sprintf("%s:%s。", "咳咳...注意！昨天最活跃（话唠）县民是", tootToPost[:lastIndex+3])
+		} else {
+			content := recurToot(n.Status.InReplyToID)
+			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Username, firstContent, content)
+			tootToPost = strings.TrimSuffix(tootToPost, "// ")
+		}
+
 		post(tootToPost)
 
-		fmt.Printf("[DEBUG] get toots fromuserid: %s, toot: %s, originToot: %s\n", fromUser.Username, filter(toot.Content), content)
+		fmt.Printf("[DEBUG] get toots fromuserid: %s, firsttoot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)
 	}
 }
 
