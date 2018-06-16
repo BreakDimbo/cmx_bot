@@ -103,7 +103,7 @@ func WeeklyAnalyze() string {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
 		hualao = "无"
 	} else {
-		hualao = fmt.Sprintf("%s@%s", laccount.DisplayName, laccount.Username)
+		hualao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
 	}
 
 	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s@%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
