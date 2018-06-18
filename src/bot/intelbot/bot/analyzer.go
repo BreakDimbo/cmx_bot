@@ -1,9 +1,9 @@
-package mastodon
+package bot
 
 import (
-	con "bot/ai_x/const"
-	"bot/ai_x/elastics"
 	"bot/config"
+	con "bot/intelbot/const"
+	"bot/intelbot/elastics"
 	"context"
 	"fmt"
 	"math/rand"
@@ -34,7 +34,7 @@ type kvPair struct {
 }
 
 func DailyAnalyze() string {
-	cf := config.GetMastodonClientInfo()
+	cf := config.IntelBotClientInfo()
 	now := time.Now().Add(cf.Timezone * time.Hour)
 	sTime := now.Add((-24 + cf.Timezone) * time.Hour)
 	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
@@ -48,7 +48,7 @@ func DailyAnalyze() string {
 	tpSlice := topN(3, tpMap)
 	var topAccounts []*kvPair
 	for _, v := range tpSlice {
-		account, err := client.GetAccount(context.Background(), gomastodon.ID(v.key))
+		account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(v.key))
 		if err != nil {
 			fmt.Printf("[ERROR] get account with id: %s error: %s\n", v.key, err)
 			tpaccount := &kvPair{key: "无", value: v.value}
@@ -61,7 +61,7 @@ func DailyAnalyze() string {
 
 	var hualao string
 	lid, lnum := mostActivePerson(ltpMap)
-	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
+	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(lid))
 	if lerr != nil {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
 		hualao = "无"
@@ -75,7 +75,7 @@ func DailyAnalyze() string {
 
 	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n2.昨日本县嘟嘟数：%d\n3.昨日本县冒泡人数：%d\n4.昨日最活跃县民榜：\n%s %s,嘟嘟%d条\n%s %s,嘟嘟%d条\n%s %s,嘟嘟%d条\n5.昨日局长眼中话唠：\n%s %s,嘟嘟%d条\n6.局长联动：本县入住传火局局长 @%s\n",
 		wpairs[0].key, wpairs[0].value, wpairs[1].key, wpairs[1].value, wpairs[2].key, wpairs[2].value, wpairs[3].key, wpairs[3].value, wpairs[4].key, wpairs[4].value, tootsCount,
-		activePersonNum, emoji, topAccounts[0].key, topAccounts[0].value, emoji, topAccounts[1].key, topAccounts[1].value, emoji, topAccounts[2].key, topAccounts[2].value, emoji, hualao, lnum, cf.Fbot)
+		activePersonNum, emoji, topAccounts[0].key, topAccounts[0].value, emoji, topAccounts[1].key, topAccounts[1].value, emoji, topAccounts[2].key, topAccounts[2].value, emoji, hualao, lnum, cf.FbotName)
 	return tootToPost
 }
 
@@ -91,14 +91,14 @@ func WeeklyAnalyze() string {
 	ltpMap := tootsByPerson(localToots)
 	activePersonNum := len(tpMap)
 	id, num := mostActivePerson(tpMap)
-	account, err := client.GetAccount(context.Background(), gomastodon.ID(id))
+	account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(id))
 	if err != nil {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
 	}
 
 	var hualao string
 	lid, lnum := mostActivePerson(ltpMap)
-	laccount, lerr := client.GetAccount(context.Background(), gomastodon.ID(lid))
+	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(lid))
 	if lerr != nil {
 		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
 		hualao = "无"
@@ -192,11 +192,6 @@ func topN(top int, m map[string]int) (pair []kvPair) {
 	}
 	fmt.Printf("[DEBUG] top n results: %s\n", pair)
 	return
-}
-
-func generateWordCloud() (medisId string) {
-	// upload media
-	return ""
 }
 
 func tootsByPerson(totalToots map[string]*indexStatus) (tootsNumPersonMap map[string]int) {

@@ -1,7 +1,6 @@
 package elastics
 
 import (
-	con "bot/ai_x/const"
 	"bot/config"
 	"context"
 	"fmt"
@@ -51,7 +50,7 @@ func init() {
 		}
 		if !exists {
 			// create mapping
-			createIndex, err := Client.CreateIndex("status").Body(con.StatusMapping).Do(context.Background())
+			createIndex, err := Client.CreateIndex("status").Body(StatusMapping).Do(context.Background())
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -68,7 +67,7 @@ func init() {
 		}
 		if !lexists {
 			// create mapping
-			createIndex, err := Client.CreateIndex("local").Body(con.StatusMapping).Do(context.Background())
+			createIndex, err := Client.CreateIndex("local").Body(StatusMapping).Do(context.Background())
 			if err != nil {
 				log.Fatal(err)
 			}

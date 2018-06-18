@@ -1,9 +1,9 @@
-package mastodon
+package bot
 
 import (
-	"bot/ai_x/const"
-	"bot/ai_x/elastics"
 	gomastodon "bot/go-mastodon"
+	"bot/intelbot/const"
+	"bot/intelbot/elastics"
 	"context"
 	"fmt"
 	"time"
@@ -51,7 +51,6 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 		Do(ctx)
 	if err != nil {
 		fmt.Printf("[ERROR] update to es error: %s/n", err)
-		// TODO: retry
 		return
 	}
 	fmt.Printf("Indexed status %s to index %s, type %s, scope %s\n", p.Id, p.Index, p.Type, scope)
@@ -70,7 +69,6 @@ func HandleDelete(e *gomastodon.DeleteEvent, scope string) {
 	_, err := elastics.Client.Delete().Index(index).Type("status").Id(e.ID).Do(ctx)
 	if err != nil {
 		fmt.Printf("[ERROR] delete %s from es error: %s\n", e.ID, err)
-		// TODO: retry
 		return
 	}
 	fmt.Printf("delete from es ok with id: %s\n", e.ID)
@@ -81,7 +79,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 	case "follow":
 		ctx := context.Background()
 		accountId := e.Notification.Account.ID
-		_, err := client.AccountFollow(ctx, accountId)
+		_, err := botClient.Normal.AccountFollow(ctx, accountId)
 		if err != nil {
 			fmt.Printf("[Error] follow account error: %s", err)
 		}
@@ -95,16 +93,16 @@ func CleanUnfollower() {
 	followerM := make(map[gomastodon.ID]bool)
 	followingM := make(map[gomastodon.ID]bool)
 
-	ca, err := client.GetAccountCurrentUser(ctx)
+	ca, err := botClient.Normal.GetAccountCurrentUser(ctx)
 	checkErr(err)
 
-	followers, err := client.GetAccountFollowers(ctx, ca.ID, pg)
+	followers, err := botClient.Normal.GetAccountFollowers(ctx, ca.ID, pg)
 	checkErr(err)
 	for _, v := range followers {
 		followerM[v.ID] = true
 	}
 
-	followings, err := client.GetAccountFollowing(ctx, ca.ID, pg)
+	followings, err := botClient.Normal.GetAccountFollowing(ctx, ca.ID, pg)
 	checkErr(err)
 	for _, v := range followings {
 		followingM[v.ID] = true
@@ -112,7 +110,7 @@ func CleanUnfollower() {
 
 	for k, _ := range followingM {
 		if _, ok := followerM[k]; !ok {
-			_, err := client.AccountUnfollow(ctx, k)
+			_, err := botClient.Normal.AccountUnfollow(ctx, k)
 			checkErr(err)
 		}
 	}

@@ -1,8 +1,8 @@
 package crontab
 
 import (
-	"bot/ai_x/mastodon"
 	"bot/config"
+	"bot/intelbot/bot"
 	"sync"
 
 	"github.com/robfig/cron"
@@ -14,13 +14,13 @@ func Start() {
 	once.Do(func() {
 		crontab := cron.New()
 		crontab.AddFunc(cronConfig.DailyTime, func() {
-			mastodon.DailyPost()
+			bot.DailyPost()
 		})
 		crontab.AddFunc(cronConfig.WeeklyTime, func() {
-			mastodon.WeeklyPost()
+			bot.WeeklyPost()
 		})
 		crontab.AddFunc(cronConfig.CleanUnfollower, func() {
-			mastodon.CleanUnfollower()
+			bot.CleanUnfollower()
 		})
 		crontab.Start()
 	})

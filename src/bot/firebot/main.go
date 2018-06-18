@@ -1,7 +1,7 @@
 package main
 
-import "bot/firebot/mastodon"
+import "bot/firebot/bot"
 
 func main() {
-	mastodon.Lauch()
+	bot.Lauch()
 }

@@ -1,6 +1,7 @@
-package mastodon
+package bot
 
 import (
+	con "bot/firebot/const"
 	gomastodon "bot/go-mastodon"
 	"context"
 	"fmt"
@@ -12,11 +13,12 @@ import (
 
 func HandleNotification(e *gomastodon.NotificationEvent) {
 	var tootToPost string
-	switch e.Notification.Type {
-	case "mention":
-		n := e.Notification
-		fromUser := n.Account
-		toot := n.Status
+	notify := e.Notification
+	switch notify.Type {
+	case con.NotificationTypeMention:
+		fromUser := notify.Account
+		toot := notify.Status
+		replyToID := notify.Status.InReplyToID
 		firstContent := filter(toot.Content)
 		reg := regexp.MustCompile("^@(.*)[[:space:]]")
 		firstContent = reg.ReplaceAllString(firstContent, "")
@@ -26,21 +28,21 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			lastIndex := strings.Index(tootToPost, "条\n")
 			tootToPost = fmt.Sprintf("%s:%s。", "咳咳...注意！昨天最活跃（话唠）县民是", tootToPost[:lastIndex+3])
 		} else {
-			content := recurToot(n.Status.InReplyToID)
+			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
 		}
 
-		post(tootToPost)
+		botClient.Post(tootToPost)
 
-		fmt.Printf("[DEBUG] get toots fromuserid: %s, firsttoot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)
+		fmt.Printf("[DEBUG] get toots from user id: %s, firsttoot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)
 	}
 }
 
 func recurToot(tootId interface{}) string {
 	if tootId != nil {
 		ctx := context.Background()
-		originToot, err := client.GetStatus(ctx, tootId.(string))
+		originToot, err := botClient.Normal.GetStatus(ctx, tootId.(string))
 		if err != nil {
 			fmt.Printf("[Error] get status error: %s\n", err)
 			return ""

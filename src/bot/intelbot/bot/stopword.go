@@ -1,4 +1,4 @@
-package mastodon
+package bot
 
 import (
 	"fmt"

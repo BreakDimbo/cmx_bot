@@ -11,14 +11,14 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-var config tomlConfig
+var config TomlConfig
 
-type tomlConfig struct {
-	Title           string
-	Ela             elastic            `toml:"elastic"`
-	PostConfig      postConifg         `toml:"post_config"`
-	MClientInfo     mastodonClientInfo `toml:"mastodon_client_info"`
-	FBotMClientInfo mastodonClientInfo `toml:"firebot"`
+type TomlConfig struct {
+	Title        string
+	Ela          elastic            `toml:"elastic"`
+	PostConfig   postConifg         `toml:"post_config"`
+	IntelBotInfo MastodonClientInfo `toml:"intelbot"`
+	FireBotInfo  MastodonClientInfo `toml:"firebot"`
 }
 
 type elastic struct {
@@ -34,14 +34,15 @@ type postConifg struct {
 	Scope           string
 }
 
-type mastodonClientInfo struct {
-	ID       string        `toml:"client_id"`
-	Secret   string        `toml:"client_secret"`
-	Sever    string        `toml:"server"`
-	Email    string        `toml:"client_email"`
-	Password string        `toml:"client_password"`
+type MastodonClientInfo struct {
+	ID       string `toml:"client_id"`
+	Secret   string `toml:"client_secret"`
+	Sever    string `toml:"server"`
+	Email    string `toml:"client_email"`
+	Password string `toml:"client_password"`
+	// differentiate the production and development evn
 	Timezone time.Duration `toml:"timezone"`
-	Fbot     string        `toml:"fbot"`
+	FbotName string        `toml:"fbot"`
 }
 
 func init() {
@@ -74,10 +75,10 @@ func GetPostConfig() postConifg {
 	return config.PostConfig
 }
 
-func GetMastodonClientInfo() mastodonClientInfo {
-	return config.MClientInfo
+func IntelBotClientInfo() MastodonClientInfo {
+	return config.IntelBotInfo
 }
 
-func GetFBotMClientInfo() mastodonClientInfo {
-	return config.FBotMClientInfo
+func FireBotClientInfo() MastodonClientInfo {
+	return config.FireBotInfo
 }
