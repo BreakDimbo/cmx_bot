@@ -16,6 +16,11 @@ const (
 	ScopeTypeLocal  = "local"
 )
 
+const (
+	AnalyzeIntervalDaily  = "daily"
+	AnalyzeIntervalWeekly = "weekly"
+)
+
 var Emoji []string
 
 func check(e error) {
