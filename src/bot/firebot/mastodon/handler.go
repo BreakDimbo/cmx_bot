@@ -24,7 +24,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			tootToPost = fmt.Sprintf("%s:%s。", "咳咳...注意！昨天最活跃（话唠）县民是", tootToPost[:lastIndex+3])
 		} else {
 			content := recurToot(n.Status.InReplyToID)
-			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Username, firstContent, content)
+			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
 		}
 
@@ -43,7 +43,7 @@ func recurToot(tootId interface{}) string {
 			return ""
 		}
 		polished := filter(originToot.Content)
-		return fmt.Sprintf("@%s:%s// %s", originToot.Account.Username, polished, recurToot(originToot.InReplyToID))
+		return fmt.Sprintf("@%s:%s// %s", originToot.Account.Acct, polished, recurToot(originToot.InReplyToID))
 	}
 	return ""
 }
