@@ -4,6 +4,7 @@ import (
 	gomastodon "bot/go-mastodon"
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -17,6 +18,8 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		fromUser := n.Account
 		toot := n.Status
 		firstContent := filter(toot.Content)
+		reg := regexp.MustCompile("^@(.*)[[:space:]]")
+		firstContent = reg.ReplaceAllString(firstContent, "")
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
 			index := strings.Index(firstContent, "县民榜：\n")
 			tootToPost = firstContent[index+12:]
