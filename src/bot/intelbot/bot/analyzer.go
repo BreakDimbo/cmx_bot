@@ -28,94 +28,21 @@ weekly active user trend
 todo daily popular toot
 */
 
-type analyzeInfo struct {
-}
-
 type kvPair struct {
 	key   string
 	count int
 }
 
 func DailyAnalyze() string {
-	cf := config.IntelBotClientInfo()
-	now := time.Now().Add(cf.Timezone * time.Hour)
-	sTime := now.Add((-24 + cf.Timezone) * time.Hour)
-	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
-	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
-	wfMap := calWordFrequency(totalToots)
-	wpairs := topN(20, wfMap)
-	tootsCount := len(totalToots)
-	tpMap := tootsCountByPerson(totalToots)
-	ltpMap := tootsCountByPerson(localToots)
-	activePersonNum := len(tpMap)
-	tpSlice := topN(3, tpMap)
-	var topAccounts []*kvPair
-	for _, v := range tpSlice {
-		account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(v.key))
-		if err != nil {
-			fmt.Printf("[ERROR] get account with id: %s error: %s\n", v.key, err)
-			tpaccount := &kvPair{key: "无", count: v.count}
-			topAccounts = append(topAccounts, tpaccount)
-			continue
-		}
-		name := fmt.Sprintf("%s·%s", account.DisplayName, account.Username)
-		topAccounts = append(topAccounts, &kvPair{key: name, count: v.count})
-	}
-
-	var hualao string
-	lid, lnum := mostActivePerson(ltpMap)
-	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(lid))
-	if lerr != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
-		hualao = "无"
-	} else {
-		hualao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
-	}
-
-	s1 := rand.NewSource(time.Now().UnixNano())
-	r1 := rand.New(s1)
-	emoji := con.Emoji[r1.Intn(len(con.Emoji))]
-
-	tootToPost := fmt.Sprintf("1.昨日本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n2.昨日本县嘟嘟数：%d\n3.昨日本县冒泡人数：%d\n4.昨日最活跃县民榜：\n%s %s,嘟嘟%d条\n%s %s,嘟嘟%d条\n%s %s,嘟嘟%d条\n5.昨日局长眼中话唠：\n%s %s,嘟嘟%d条\n6.局长联动：本县入住传火局局长 @%s\n",
-		wpairs[0].key, wpairs[0].count, wpairs[1].key, wpairs[1].count, wpairs[2].key, wpairs[2].count, wpairs[3].key, wpairs[3].count, wpairs[4].key, wpairs[4].count, tootsCount,
-		activePersonNum, emoji, topAccounts[0].key, topAccounts[0].count, emoji, topAccounts[1].key, topAccounts[1].count, emoji, topAccounts[2].key, topAccounts[2].count, emoji, hualao, lnum, cf.FbotName)
-	return tootToPost
+	return analyze(con.AnalyzeIntervalDaily)
 }
 
 func WeeklyAnalyze() string {
-	now := time.Now().Add(4 * time.Hour)
-	sTime := now.Add(-164 * time.Hour)
-	totalToots := fetchDataByTime(sTime, now, con.ScopeTypePublic)
-	localToots := fetchDataByTime(sTime, now, con.ScopeTypeLocal)
-	wfMap := calWordFrequency(totalToots)
-	wpairs := topN(20, wfMap)
-	tootsCount := len(totalToots)
-	tpMap := tootsCountByPerson(totalToots)
-	ltpMap := tootsCountByPerson(localToots)
-	activePersonNum := len(tpMap)
-	id, num := mostActivePerson(tpMap)
-	account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(id))
-	if err != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, err)
-	}
-
-	var hualao string
-	lid, lnum := mostActivePerson(ltpMap)
-	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(lid))
-	if lerr != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", lid, lerr)
-		hualao = "无"
-	} else {
-		hualao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
-	}
-
-	tootToPost := fmt.Sprintf("1.上周本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n 2.上周本县嘟嘟数：%d\n 3.上周本县冒泡人数：%d\n 4.上周最活跃县民：%s@%s, 共嘟嘟了%d条\n 5.上周局长眼中话唠：%s, 共嘟嘟了%d条\n",
-		wpairs[0].key, wpairs[0].count, wpairs[1].key, wpairs[1].count, wpairs[2].key, wpairs[2].count, wpairs[3].key, wpairs[3].count, wpairs[4].key, wpairs[4].count, tootsCount,
-		activePersonNum, account.DisplayName, account.Username, num, hualao, lnum)
-	return tootToPost
+	return analyze(con.AnalyzeIntervalWeekly)
 }
 
-func analyze(interval string) {
+func analyze(interval string) (toot string) {
+	// TODO: refacte
 	var startTime time.Time
 	var intervalStr string
 	var localHuaLao string
@@ -167,10 +94,15 @@ func analyze(interval string) {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 	emoji := con.Emoji[r1.Intn(len(con.Emoji))]
+
+	toot = parseToToot(intervalStr, wordcounts, publicTootCount,
+		activePersonCount, accNameTootsCounts, emoji, localHuaLao,
+		count, config.FbotName)
+	return toot
 }
 
-func parseToToot(intervalStr string, wordcounts []kvPair, publicTootCount int,
-	activePersonCount int, accNameTootsCounts []kvPair, emoji string) (toot string) {
+func parseToToot(intervalStr string, wordcounts []*kvPair, publicTootCount int,
+	activePersonCount int, accNameTootsCounts []*kvPair, emoji string, localHuaLao string, huaLaoCount int, firebot string) (toot string) {
 	//TODO: use loop
 	keyWordsStr := fmt.Sprintf("1.%s本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n",
 		intervalStr,
@@ -186,7 +118,10 @@ func parseToToot(intervalStr string, wordcounts []kvPair, publicTootCount int,
 		emoji, accNameTootsCounts[0].key, accNameTootsCounts[0].count,
 		emoji, accNameTootsCounts[1].key, accNameTootsCounts[1].count,
 		emoji, accNameTootsCounts[2].key, accNameTootsCounts[2].count)
-	return keyWordsStr
+	secretaryHuaLaoStr := fmt.Sprintf("5.%s局长眼中话唠：\n%s %s,嘟嘟%d条\n",
+		intervalStr, emoji, localHuaLao, huaLaoCount)
+	secretaryCooperateStr := fmt.Sprintf("6.局长联动：本县入住传火局局长 @%s\n", firebot)
+	return keyWordsStr + tootCountStr + activePersonCountStr + mostActiveRankStr + secretaryHuaLaoStr + secretaryCooperateStr
 }
 
 func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sResult map[string]*indexStatus) {
@@ -253,11 +188,11 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 	return
 }
 
-func topN(top int, m map[string]int) (pair []kvPair) {
+func topN(top int, m map[string]int) (pair []*kvPair) {
 	mlen := len(m)
-	pair = make([]kvPair, mlen)
+	pair = make([]*kvPair, mlen)
 	for k, v := range m {
-		pair = append(pair, kvPair{key: k, count: v})
+		pair = append(pair, &kvPair{key: k, count: v})
 	}
 	sort.Slice(pair, func(i, j int) bool {
 		return pair[i].count > pair[j].count

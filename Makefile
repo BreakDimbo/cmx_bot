@@ -2,7 +2,7 @@ export GOPATH := $(CURDIR)
 
 bot:
 	@echo "Building CmxBot ..."
-	go build -o bin/bot bot/ai_x
+	go build -o bin/bot bot/intelbot
 
 fbot:
 	@echo "Building FirtBot ..."
