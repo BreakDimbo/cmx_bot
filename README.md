@@ -8,7 +8,7 @@ Now there are 2 kinds of bot:
 Intelbot is a bot which collects and analyzes the toots.
 It will show the following items daily and weekly
 * keywords of top five
-* total toots in local timeline
+* total count of toots in local timeline
 * total count of users who tooted in local timeline
 * the top 3 users who like toot most in local timeline
 * the top 1 user who like toot most in home
@@ -19,16 +19,31 @@ Reply the toot with review and @firebot.
 
 # Install
 1. [install golang](https://golang.org/doc/install)
-1. git clone git@github.com:BreakDimbo/cmx_bot.git
-2. change to working directory
-3. make get
-4. make deps
-5. make bot
-6. make fbot
-7. [install elastic search 6.3.0](https://www.elastic.co/downloads/elasticsearch) (maybe you need install java runtime env)
-8. sudo touch /var/log/mastodon_bot
-9. sudo chown ${your_current_user} /var/log/mastodon_bot
-10. set the config file in config/development.toml according to config/development.demo.toml
+2. clone the project
+```bash
+git clone git@github.com:BreakDimbo/cmx_bot.git
+```
+3. change to working directory
+```bash
+cd cmx_bot
+```
+4. install dependency
+```bash
+make get
+make deps
+```
+5. build the binary file
+```bash
+make bot
+make fbot
+```
+6. [install elastic search 6.3.0](https://www.elastic.co/downloads/elasticsearch) (maybe you need install java runtime env)
+7. create the log file
+```bash
+sudo touch /var/log/mastodon_bot
+sudo chown ${your_current_user} /var/log/mastodon_bot
+```
+8. set the config file in config/development.toml according to config/development.demo.toml
 
 # Usage
 1. run elasticsearch
@@ -40,8 +55,7 @@ Reply the toot with review and @firebot.
 ```bash
 #{working_directory}/bin/fbot
 ```
-
-there are xxx.service files for systemd usage in dir config
+4. there are xxx.service files for systemd usage in dir config
 
 # TODO
 
