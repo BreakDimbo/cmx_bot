@@ -12,6 +12,9 @@ const StatusMapping = `
 				"id":{
 					"type":"keyword"
 				},
+				"server":{
+					"type":"keyword"
+				},
 				"created_at":{
 					"type":"date"
 				},
@@ -47,6 +50,9 @@ const LocalMapping = `
 		"local":{
 			"properties":{
 				"id":{
+					"type":"keyword"
+				},
+				"server":{
 					"type":"keyword"
 				},
 				"created_at":{

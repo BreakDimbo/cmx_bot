@@ -135,9 +135,12 @@ func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sRes
 	case con.ScopeTypePublic:
 		index = "status"
 	}
-	query := elastic.NewRangeQuery("created_at").
-		Gte(stStr).
-		Lte(edStr)
+
+	query := elastic.NewBoolQuery()
+	query = query.Filter(elastic.NewRangeQuery("created_at").Gte(stStr).Lte(edStr))
+	cfg := config.IntelBotClientInfo()
+	termQuery := elastic.NewTermQuery("server", cfg.Sever)
+	query = query.Must(termQuery)
 
 	searchResult, err := elastics.Client.Search().
 		Index(index).

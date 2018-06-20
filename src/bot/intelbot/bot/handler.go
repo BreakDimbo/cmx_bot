@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"bot/config"
 	gomastodon "bot/go-mastodon"
 	"bot/intelbot/const"
 	"bot/intelbot/elastics"
@@ -20,9 +21,11 @@ type indexStatus struct {
 	FavouritesCount int64     `json:"favourites_count"`
 	Sensitive       bool      `json:"sensitive"`
 	Scope           string    `json:"scope"` //curl -XPUT "http://localhost:9200/status/_mapping/status" -H 'Content-Type: application/json' -d '{"properties": {"scope": {"type": "keyword"}}}'
+	Server          string    `json:"server"`
 }
 
 func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
+	cfg := config.IntelBotClientInfo()
 	polished := filter(e.Status.Content)
 	indexS := &indexStatus{
 		ID:              string(e.Status.ID),
@@ -32,6 +35,7 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 		ReblogsCount:    e.Status.ReblogsCount,
 		FavouritesCount: e.Status.FavouritesCount,
 		Sensitive:       e.Status.Sensitive,
+		Server:          cfg.Sever,
 	}
 
 	var index string
