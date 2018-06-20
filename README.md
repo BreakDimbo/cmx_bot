@@ -57,6 +57,10 @@ sudo chown ${your_current_user} /var/log/mastodon_bot
 ```
 4. there are xxx.service files for systemd usage in dir config
 
+# Preview
+
+![preview](https://raw.githubusercontent.com/BreakDimbo/cmx_bot/master/doc/preview.png)
+
 # TODO
 
 - [x] set config.yml
