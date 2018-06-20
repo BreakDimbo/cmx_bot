@@ -1,5 +1,7 @@
 bin/*
 pkg/*
+config/production.toml
+config/development.toml
 
 *.out
 *.log
