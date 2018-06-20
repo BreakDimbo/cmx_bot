@@ -1,0 +1,29 @@
+title = "develoment configration"
+
+[elastic]
+url = "http://127.0.0.1:9200"
+username = ""
+password = ""
+
+[post_config]
+daily_cron_time = "0 14 11 * * *"
+weekly_cron_time = "0 11 11 * * 2"
+clean_unfollowers_time = "@every 10m"
+scope = "private"
+
+[intelbot]
+client_id       = "xxx"
+client_secret   = "xxx"
+server          = "https://cmx.im"
+client_email    = "xxx"
+client_password = "xxx"
+timezone = -8 # gap between date of bot server and the mastodon server
+fbot = "firebot" # mastodon username of the firebot
+
+
+[firebot]
+client_id       = "xxx"
+client_secret   = "xxx"
+server          = "https://cmx.im"
+client_email    = "xxx"
+client_password = "xxx"
