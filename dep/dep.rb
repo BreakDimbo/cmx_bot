@@ -29,7 +29,7 @@ p options
 def pull_and_compile_restart(services, target, dir)
   services.each do |service|
     puts "start pull #{service} to #{target}"
-    mkdir = "ai_x" if service == "bot"
+    mkdir = "intelbot" if service == "bot"
     mkdir = "firebot" if service == "fbot"
 
     raise unless system("ssh #{target} \"cd /home/break/documents/cmx_bot; export GOPATH=/home/break/documents/cmx_bot; git pull; /usr/local/go/bin/go build -o bin/#{service} bot/#{mkdir}\"")
