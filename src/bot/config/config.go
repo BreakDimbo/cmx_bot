@@ -15,6 +15,7 @@ var config TomlConfig
 
 type TomlConfig struct {
 	Title        string
+	ENV          string
 	Ela          elastic            `toml:"elastic"`
 	PostConfig   postConifg         `toml:"post_config"`
 	IntelBotInfo MastodonClientInfo `toml:"intelbot"`
@@ -50,7 +51,6 @@ func init() {
 	rootedPath, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 	flag.Parse()
 	fmt.Printf("Running in %s env\n", *runingEnv)
@@ -65,6 +65,7 @@ func init() {
 	if err := toml.Unmarshal(dat, &config); err != nil {
 		log.Fatal(err)
 	}
+	config.ENV = *runingEnv
 }
 
 func GetElastic() elastic {
@@ -73,6 +74,10 @@ func GetElastic() elastic {
 
 func GetPostConfig() postConifg {
 	return config.PostConfig
+}
+
+func GetRuntimeEnv() string {
+	return config.ENV
 }
 
 func IntelBotClientInfo() MastodonClientInfo {

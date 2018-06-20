@@ -2,8 +2,8 @@ package elastics
 
 import (
 	"bot/config"
+	zlog "bot/log"
 	"context"
-	"fmt"
 	"log"
 	"sync"
 
@@ -24,24 +24,24 @@ func init() {
 			elastic.SetRetrier(NewMyRetrier()),
 		)
 		if err != nil {
-			fmt.Printf("[ERROR] new es client error: %s", err)
+			zlog.SLogger.Errorf("new es client error: %s", err)
 			return
 		}
 		// Ping the Elasticsearch server to get e.g. the version number
 		info, code, err := Client.Ping(e.Url).Do(context.Background())
 		if err != nil {
-			fmt.Printf("[ERROR] ping es error: %s", err)
+			zlog.SLogger.Errorf("ping es error: %s", err)
 			return
 		}
-		fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+		zlog.SLogger.Infof("Elasticsearch returned with code %d and version %s", code, info.Version.Number)
 
 		// Getting the ES version number is quite common, so there's a shortcut
 		esversion, err := Client.ElasticsearchVersion(e.Url)
 		if err != nil {
-			fmt.Printf("[ERROR] get es version error: %s", err)
+			zlog.SLogger.Errorf("get es version error: %s", err)
 			return
 		}
-		fmt.Printf("Elasticsearch version %s\n", esversion)
+		zlog.SLogger.Infof("Elasticsearch version %s", esversion)
 
 		// Use the IndexExists service to check if a specified index exists.
 		exists, err := Client.IndexExists("status").Do(context.Background())
@@ -56,7 +56,7 @@ func init() {
 			}
 
 			if !createIndex.Acknowledged {
-				log.Println("createIndex not acknowledged")
+				zlog.SLogger.Warn("createIndex not acknowledged")
 			}
 		}
 
@@ -73,7 +73,7 @@ func init() {
 			}
 
 			if !createIndex.Acknowledged {
-				log.Println("createIndex not acknowledged")
+				zlog.SLogger.Warn("createIndex not acknowledged")
 			}
 		}
 	})

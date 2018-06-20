@@ -3,8 +3,9 @@ package client
 import (
 	"bot/config"
 	gomastodon "bot/go-mastodon"
+	zlog "bot/log"
 	"context"
-	"fmt"
+	"log"
 )
 
 type BotClient struct {
@@ -21,7 +22,7 @@ func New(config *config.MastodonClientInfo) (*BotClient, error) {
 	})
 	err := c.Authenticate(context.Background(), config.Email, config.Password)
 	if err != nil {
-		fmt.Printf("[ERROR]: authenticate error of mastodon client: %s\n", err)
+		log.Fatalf("[Fatal]: authenticate error of mastodon client: %s\n", err)
 		return nil, err
 	}
 	bc := &BotClient{Normal: c, WS: c.NewWSClient()}
@@ -35,7 +36,7 @@ func (bc *BotClient) Post(toot string) error {
 		Visibility: pc.Scope,
 	})
 	if err != nil {
-		fmt.Printf("[ERROR]: post error: %s", err)
+		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
 		return err
 	}
 	return nil

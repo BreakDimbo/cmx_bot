@@ -4,6 +4,7 @@ import (
 	"bot/config"
 	con "bot/intelbot/const"
 	"bot/intelbot/elastics"
+	"bot/log"
 	"context"
 	"fmt"
 	"math/rand"
@@ -73,7 +74,7 @@ func analyze(interval string) (toot string) {
 	for _, v := range accIDTootsCounts {
 		account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(v.key))
 		if err != nil {
-			fmt.Printf("[ERROR] get account with id: %s error: %s\n", v.key, err)
+			log.SLogger.Errorf("get account with id: %s error: %s", v.key, err)
 			tpaccount := kvPair{key: "无", count: v.count}
 			accNameTootsCounts = append(accNameTootsCounts, tpaccount)
 			continue
@@ -85,7 +86,7 @@ func analyze(interval string) (toot string) {
 	id, count := mostActivePerson(localTootsCbyP)
 	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(id))
 	if lerr != nil {
-		fmt.Printf("[ERROR] get account with id: %s error: %s\n", id, lerr)
+		log.SLogger.Errorf("get account with id: %s error: %s", id, lerr)
 		localHuaLao = "无"
 	} else {
 		localHuaLao = fmt.Sprintf("%s·%s", laccount.DisplayName, laccount.Username)
@@ -145,7 +146,7 @@ func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sRes
 		Pretty(true).
 		Do(context.Background())
 	if err != nil {
-		fmt.Printf("[ERROR]:search error: %s\n", err)
+		log.SLogger.Errorf("search from elastic error: %s", err)
 		return nil
 	}
 
@@ -170,7 +171,6 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 			if stopwords[w] {
 				continue
 			}
-
 			hasAlphabet := false
 			for _, r := range w {
 				if !unicode.Is(unicode.Scripts["Han"], r) {
@@ -181,7 +181,6 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 			if hasAlphabet {
 				continue
 			}
-
 			wFreMap[w] += 1
 		}
 	}
@@ -202,7 +201,7 @@ func topN(top int, m map[string]int) (pair []kvPair) {
 	} else {
 		pair = pair[:top]
 	}
-	fmt.Printf("[DEBUG] top n results: %s\n", pair)
+	log.SLogger.Infof("top %d results: %s", top, pair)
 	return
 }
 

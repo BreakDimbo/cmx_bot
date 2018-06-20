@@ -3,8 +3,8 @@ package bot
 import (
 	"bot/client"
 	"bot/config"
+	zlog "bot/log"
 	"context"
-	"fmt"
 	"log"
 	"sync"
 
@@ -41,7 +41,7 @@ func Lauch() {
 			e := uq.(*gomastodon.NotificationEvent)
 			HandleNotification(e)
 		default:
-			fmt.Printf("other event: %s\n", uq)
+			zlog.SLogger.Infof("receive other event: %s", uq)
 		}
 	}
 }

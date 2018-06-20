@@ -3,6 +3,7 @@ package bot
 import (
 	con "bot/firebot/const"
 	gomastodon "bot/go-mastodon"
+	"bot/log"
 	"context"
 	"fmt"
 	"regexp"
@@ -14,6 +15,7 @@ import (
 func HandleNotification(e *gomastodon.NotificationEvent) {
 	var tootToPost string
 	notify := e.Notification
+
 	switch notify.Type {
 	case con.NotificationTypeMention:
 		fromUser := notify.Account
@@ -22,6 +24,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		firstContent := filter(toot.Content)
 		reg := regexp.MustCompile("^@(.*)[[:space:]]")
 		firstContent = reg.ReplaceAllString(firstContent, "")
+
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
 			index := strings.Index(firstContent, "县民榜：\n")
 			tootToPost = firstContent[index+12:]
@@ -35,7 +38,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 
 		botClient.Post(tootToPost)
 
-		fmt.Printf("[DEBUG] get toots from user id: %s, firsttoot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)
+		log.SLogger.Infof("get toots from user id: %s, first toot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)
 	}
 }
 
@@ -44,7 +47,7 @@ func recurToot(tootId interface{}) string {
 		ctx := context.Background()
 		originToot, err := botClient.Normal.GetStatus(ctx, tootId.(string))
 		if err != nil {
-			fmt.Printf("[Error] get status error: %s\n", err)
+			log.SLogger.Errorf("get status error: %s", err)
 			return ""
 		}
 		polished := filter(originToot.Content)

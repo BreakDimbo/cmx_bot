@@ -4,8 +4,8 @@ import (
 	"bot/client"
 	"bot/config"
 	"bot/intelbot/const"
+	zlog "bot/log"
 	"context"
-	"fmt"
 	"log"
 	"sync"
 
@@ -56,7 +56,7 @@ func Lauch() {
 				e := event.(*gomastodon.NotificationEvent)
 				HandleNotification(e)
 			default:
-				fmt.Printf("other event: %s\n", event)
+				zlog.SLogger.Infof("receive other event: %s", event)
 			}
 
 		case event := <-publicCh:
@@ -68,7 +68,7 @@ func Lauch() {
 				e := event.(*gomastodon.DeleteEvent)
 				HandleDelete(e, con.ScopeTypePublic)
 			default:
-				fmt.Printf("other event: %s\n", event)
+				zlog.SLogger.Infof("receive other event: %s", event)
 			}
 		}
 	}

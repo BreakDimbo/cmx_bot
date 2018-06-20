@@ -4,8 +4,8 @@ import (
 	gomastodon "bot/go-mastodon"
 	"bot/intelbot/const"
 	"bot/intelbot/elastics"
+	"bot/log"
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -50,10 +50,10 @@ func HandleUpdate(e *gomastodon.UpdateEvent, scope string) {
 		BodyJson(indexS).
 		Do(ctx)
 	if err != nil {
-		fmt.Printf("[ERROR] update to es error: %s/n", err)
+		log.SLogger.Errorf("update to es error: %s", err)
 		return
 	}
-	fmt.Printf("Indexed status %s to index %s, type %s, scope %s\n", p.Id, p.Index, p.Type, scope)
+	log.SLogger.Infof("indexed status %s to index %s, type %s, scope %s", p.Id, p.Index, p.Type, scope)
 }
 
 func HandleDelete(e *gomastodon.DeleteEvent, scope string) {
@@ -68,10 +68,10 @@ func HandleDelete(e *gomastodon.DeleteEvent, scope string) {
 	ctx := context.Background()
 	_, err := elastics.Client.Delete().Index(index).Type("status").Id(e.ID).Do(ctx)
 	if err != nil {
-		fmt.Printf("[ERROR] delete %s from es error: %s\n", e.ID, err)
+		log.SLogger.Errorf("delete %s from es error: %s", e.ID, err)
 		return
 	}
-	fmt.Printf("delete from es ok with id: %s\n", e.ID)
+	log.SLogger.Infof("delete from es ok with id: %s", e.ID)
 }
 
 func HandleNotification(e *gomastodon.NotificationEvent) {
@@ -81,13 +81,13 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		accountId := e.Notification.Account.ID
 		_, err := botClient.Normal.AccountFollow(ctx, accountId)
 		if err != nil {
-			fmt.Printf("[Error] follow account error: %s", err)
+			log.SLogger.Errorf("follow account error: %s", err)
 		}
 	}
 }
 
 func CleanUnfollower() {
-	fmt.Printf("Start cleaning unfollowers\n")
+	log.SLogger.Infof("Start cleaning unfollowers")
 	ctx := context.Background()
 	pg := &gomastodon.Pagination{Limit: 80}
 	followerM := make(map[gomastodon.ID]bool)
@@ -114,6 +114,7 @@ func CleanUnfollower() {
 			checkErr(err)
 		}
 	}
+	log.SLogger.Infof("Over cleaning unfollowers")
 }
 
 func filter(raw string) (polished string) {
@@ -124,6 +125,6 @@ func filter(raw string) (polished string) {
 
 func checkErr(err error) {
 	if err != nil {
-		fmt.Printf("[ERROR] get error: %s\n", err)
+		log.SLogger.Errorf("get error: %s", err)
 	}
 }
