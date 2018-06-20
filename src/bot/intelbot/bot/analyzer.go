@@ -42,20 +42,20 @@ func WeeklyAnalyze() string {
 }
 
 func analyze(interval string) (toot string) {
-	// TODO: refacte
+	// TODO: refactor
 	var startTime time.Time
 	var intervalStr string
 	var localHuaLao string
-	var accNameTootsCounts []*kvPair
+	var accNameTootsCounts []kvPair
 
 	config := config.IntelBotClientInfo()
 	toTime := time.Now().Add(config.Timezone * time.Hour)
 	switch interval {
 	case con.AnalyzeIntervalDaily:
-		startTime = startTime.Add((-24 + config.Timezone) * time.Hour)
+		startTime = toTime.Add((-24 + config.Timezone) * time.Hour)
 		intervalStr = "昨日"
 	case con.AnalyzeIntervalWeekly:
-		startTime = startTime.Add((7*-24 + config.Timezone) * time.Hour)
+		startTime = toTime.Add((7*-24 + config.Timezone) * time.Hour)
 		intervalStr = "上周"
 	}
 
@@ -74,12 +74,12 @@ func analyze(interval string) (toot string) {
 		account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(v.key))
 		if err != nil {
 			fmt.Printf("[ERROR] get account with id: %s error: %s\n", v.key, err)
-			tpaccount := &kvPair{key: "无", count: v.count}
+			tpaccount := kvPair{key: "无", count: v.count}
 			accNameTootsCounts = append(accNameTootsCounts, tpaccount)
 			continue
 		}
 		name := fmt.Sprintf("%s·%s", account.DisplayName, account.Username)
-		accNameTootsCounts = append(accNameTootsCounts, &kvPair{key: name, count: v.count})
+		accNameTootsCounts = append(accNameTootsCounts, kvPair{key: name, count: v.count})
 	}
 
 	id, count := mostActivePerson(localTootsCbyP)
@@ -101,8 +101,8 @@ func analyze(interval string) (toot string) {
 	return toot
 }
 
-func parseToToot(intervalStr string, wordcounts []*kvPair, publicTootCount int,
-	activePersonCount int, accNameTootsCounts []*kvPair, emoji string, localHuaLao string, huaLaoCount int, firebot string) (toot string) {
+func parseToToot(intervalStr string, wordcounts []kvPair, publicTootCount int,
+	activePersonCount int, accNameTootsCounts []kvPair, emoji string, localHuaLao string, huaLaoCount int, firebot string) (toot string) {
 	//TODO: use loop
 	keyWordsStr := fmt.Sprintf("1.%s本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n",
 		intervalStr,
@@ -188,11 +188,11 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 	return
 }
 
-func topN(top int, m map[string]int) (pair []*kvPair) {
+func topN(top int, m map[string]int) (pair []kvPair) {
 	mlen := len(m)
-	pair = make([]*kvPair, mlen)
+	pair = make([]kvPair, mlen)
 	for k, v := range m {
-		pair = append(pair, &kvPair{key: k, count: v})
+		pair = append(pair, kvPair{key: k, count: v})
 	}
 	sort.Slice(pair, func(i, j int) bool {
 		return pair[i].count > pair[j].count
