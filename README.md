@@ -11,7 +11,7 @@
 - [x] post weekly
 - [x] collect local toots of followers
 - [x] refactor the structure
-- [ ] log
+- [x] log
 - [x] remove config.toml file
 - [ ] complete the readme
 - [ ] cache info in nsq when es connect down
