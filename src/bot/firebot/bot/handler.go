@@ -30,6 +30,8 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			tootToPost = firstContent[index+12:]
 			lastIndex := strings.Index(tootToPost, "条\n")
 			tootToPost = fmt.Sprintf("%s:%s。", "咳咳...注意！昨天最活跃（话唠）县民是", tootToPost[:lastIndex+3])
+		} else if strings.Contains(firstContent, "#树洞") {
+			tootToPost = firstContent
 		} else {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
