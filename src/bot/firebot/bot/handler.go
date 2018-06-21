@@ -22,7 +22,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		toot := notify.Status
 		replyToID := notify.Status.InReplyToID
 		firstContent := filter(toot.Content)
-		reg := regexp.MustCompile("^@(.*)[[:space:]]")
+		reg := regexp.MustCompile("^@[^ ]*")
 		firstContent = reg.ReplaceAllString(firstContent, "")
 
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
