@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"bot/bredis"
 	con "bot/firebot/const"
 	gomastodon "bot/go-mastodon"
 	"bot/log"
@@ -22,8 +23,6 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		toot := notify.Status
 		replyToID := notify.Status.InReplyToID
 		firstContent := filter(toot.Content)
-		reg := regexp.MustCompile("^@[^ ]*")
-		firstContent = reg.ReplaceAllString(firstContent, "")
 
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
 			index := strings.Index(firstContent, "县民榜：\n")
@@ -33,15 +32,33 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		} else if strings.Contains(firstContent, "#树洞") {
 			tootToPost = firstContent
 		} else {
+			reg := regexp.MustCompile("^@[^ ]*")
+			firstContent = reg.ReplaceAllString(firstContent, "")
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
 		}
 
-		botClient.Post(tootToPost)
+		id, _ := botClient.Post(tootToPost)
+
+		err := bredis.Client.Set(string(toot.ID), string(id), con.TootIDRedisTimeout).Err()
+		if err != nil {
+			log.SLogger.Errorf("set id: %s to redis error: %s", id, err)
+		}
 
 		log.SLogger.Infof("get toots from user id: %s, first toot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)
 	}
+}
+
+func HandleDelete(e *gomastodon.DeleteEvent) {
+	id := e.ID
+	fbotTootID, err := bredis.Client.Get(string(id)).Result()
+	if err != nil {
+		// log.SLogger.Errorf("get toot: %s from redis error: %s", id, err)
+		return
+	}
+	log.SLogger.Infof("start to delete toot with id: %s", fbotTootID)
+	botClient.DeleteToot(fbotTootID)
 }
 
 func recurToot(tootId interface{}) string {
