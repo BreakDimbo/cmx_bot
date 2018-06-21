@@ -34,15 +34,16 @@ type kvPair struct {
 	count int
 }
 
-func DailyAnalyze() string {
+func DailyAnalyze() (string, string) {
 	return analyze(con.AnalyzeIntervalDaily)
 }
 
 func WeeklyAnalyze() string {
-	return analyze(con.AnalyzeIntervalWeekly)
+	t, _ := analyze(con.AnalyzeIntervalWeekly)
+	return t
 }
 
-func analyze(interval string) (toot string) {
+func analyze(interval string) (toot string, hideToot string) {
 	// TODO: refactor
 	var startTime time.Time
 	var intervalStr string
@@ -99,11 +100,19 @@ func analyze(interval string) (toot string) {
 	toot = parseToToot(intervalStr, wordcounts, publicTootCount,
 		activePersonCount, accNameTootsCounts, emoji, localHuaLao,
 		count, config.FbotName)
-	return toot
+
+	if interval == con.AnalyzeIntervalDaily {
+		t := findMostShiningToot(publicToots)
+		toot = toot + fmt.Sprintf("7.昨日最✨嘟嘟：来自%s·%s，转嘟%d次，收藏%d次。\n", t.Account.DisplayName,
+			t.Account.Username, t.ReblogsCount, t.FavouritesCount)
+		hideToot = filter(t.Content) + fmt.Sprintf("\n🔗：%s", t.URL)
+	}
+	return toot, hideToot
 }
 
 func parseToToot(intervalStr string, wordcounts []kvPair, publicTootCount int,
-	activePersonCount int, accNameTootsCounts []kvPair, emoji string, localHuaLao string, huaLaoCount int, firebot string) (toot string) {
+	activePersonCount int, accNameTootsCounts []kvPair, emoji string, localHuaLao string,
+	huaLaoCount int, firebot string) (toot string) {
 	//TODO: use loop
 	keyWordsStr := fmt.Sprintf("1.%s本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n",
 		intervalStr,
@@ -158,6 +167,32 @@ func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sRes
 	for _, item := range searchResult.Each(reflect.TypeOf(toot)) {
 		t := item.(*indexStatus)
 		sResult[t.ID] = t
+	}
+	return
+}
+
+func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Status) {
+	ctx := context.Background()
+	shingNum := int64(0)
+
+	log.SLogger.Debugf("totoal toots num to cal shinging: %d", len(toots))
+	for id, v := range toots {
+		toot, _ := botClient.Normal.GetStatus(ctx, id)
+		(*v).ReblogsCount = toot.ReblogsCount
+		(*v).FavouritesCount = toot.FavouritesCount
+
+		elastics.Client.Update().Index(con.ScopeTypePublic).Type("status").Id(id).Doc(*v).Do(ctx)
+		if err != nil {
+			log.SLogger.Errorf("update favourite count to es error: %s", err)
+		}
+
+		n := toot.FavouritesCount + toot.ReblogsCount
+		if n > shingNum {
+			shingNum = n
+			stoot = toot
+		}
+		time.Sleep(1 / 100 * time.Second)
+		log.SLogger.Debugf("over toot: %d", id)
 	}
 	return
 }

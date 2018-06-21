@@ -43,6 +43,20 @@ func (bc *BotClient) Post(toot string) (gomastodon.ID, error) {
 	return status.ID, nil
 }
 
+func (bc *BotClient) PostSpoiler(spolier string, toot string) (gomastodon.ID, error) {
+	pc := config.GetPostConfig()
+	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
+		Status:      toot,
+		Visibility:  pc.Scope,
+		SpoilerText: spolier,
+	})
+	if err != nil {
+		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
+		return "", err
+	}
+	return status.ID, nil
+}
+
 func (bc *BotClient) DeleteToot(id string) error {
 	ctx := context.Background()
 	fbotTootID, err := strconv.ParseInt(id, 10, 64)

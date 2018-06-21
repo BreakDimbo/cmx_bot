@@ -1,8 +1,8 @@
 package bot
 
 func DailyPost() {
-	status := DailyAnalyze()
-	botClient.Post(status)
+	status, htoot := DailyAnalyze()
+	botClient.PostSpoiler(status, htoot)
 }
 
 func WeeklyPost() {
