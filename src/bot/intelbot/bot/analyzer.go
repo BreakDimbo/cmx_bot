@@ -175,7 +175,7 @@ func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Statu
 	ctx := context.Background()
 	shingNum := int64(0)
 
-	log.SLogger.Debugf("totoal toots num to cal shinging: %d", len(toots))
+	log.SLogger.Infof("totoal toots num to cal shinging: %d", len(toots))
 	for id, v := range toots {
 		toot, _ := botClient.Normal.GetStatus(ctx, id)
 		(*v).ReblogsCount = toot.ReblogsCount
@@ -191,8 +191,8 @@ func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Statu
 			shingNum = n
 			stoot = toot
 		}
-		time.Sleep(1 / 100 * time.Second)
-		log.SLogger.Debugf("over toot: %d", id)
+		time.Sleep(1 * time.Second)
+		log.SLogger.Infof("over toot: %d", id)
 	}
 	return
 }
