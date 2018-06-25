@@ -5,8 +5,13 @@ import (
 	gomastodon "bot/go-mastodon"
 	zlog "bot/log"
 	"context"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"os"
 	"strconv"
+	"strings"
 )
 
 type BotClient struct {
@@ -57,19 +62,68 @@ func (bc *BotClient) PostSpoiler(spolier string, toot string) (gomastodon.ID, er
 	return status.ID, nil
 }
 
-func (bc *BotClient) PostSensetive(spolier string, toot string, sensitive bool) (gomastodon.ID, error) {
+func (bc *BotClient) PostSensetiveWithPic(spolier string, toot string, sensitive bool, medias []gomastodon.Attachment) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
+	var mediasID []gomastodon.ID
+
+	for _, media := range medias {
+		fp := downloadPic(media.URL)
+		attachment, err := bc.Normal.UploadMedia(context.Background(), fp)
+		if err != nil {
+			zlog.SLogger.Errorf("upload pic failed: %s", err)
+			continue
+		}
+		mediasID = append(mediasID, gomastodon.ID(attachment.ID))
+		removeFile(fp)
+	}
+
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
 		Status:      toot,
 		Visibility:  pc.Scope,
 		SpoilerText: spolier,
 		Sensitive:   sensitive,
+		MediaIDs:    mediasID,
 	})
 	if err != nil {
 		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
 		return "", err
 	}
 	return status.ID, nil
+}
+
+func downloadPic(remoteURL string) (localURL string) {
+	// Create the file
+	filenameSlice := strings.Split(remoteURL, "/")
+	filename := filenameSlice[len(filenameSlice)-1]
+	filepath := fmt.Sprintf("/tmp/cmx_pic/%s", filename)
+	out, err := os.Create(filepath)
+	if err != nil {
+		zlog.SLogger.Error(err)
+	}
+	defer out.Close()
+
+	// Get the data
+	resp, err := http.Get(remoteURL)
+	if err != nil {
+		zlog.SLogger.Error(err)
+	}
+	defer resp.Body.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		zlog.SLogger.Error(err)
+	}
+
+	return filepath
+}
+
+func removeFile(filepath string) {
+	err := os.Remove(filepath)
+	if err != nil {
+		zlog.SLogger.Errorf("remove file error: %s", err)
+		return
+	}
 }
 
 func (bc *BotClient) PostWithPicture(spolier string, toot string) (gomastodon.ID, error) {
