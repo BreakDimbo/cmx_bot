@@ -57,6 +57,35 @@ func (bc *BotClient) PostSpoiler(spolier string, toot string) (gomastodon.ID, er
 	return status.ID, nil
 }
 
+func (bc *BotClient) PostSensetive(spolier string, toot string, sensitive bool) (gomastodon.ID, error) {
+	pc := config.GetPostConfig()
+	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
+		Status:      toot,
+		Visibility:  pc.Scope,
+		SpoilerText: spolier,
+		Sensitive:   sensitive,
+	})
+	if err != nil {
+		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
+		return "", err
+	}
+	return status.ID, nil
+}
+
+func (bc *BotClient) PostWithPicture(spolier string, toot string) (gomastodon.ID, error) {
+	pc := config.GetPostConfig()
+	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
+		Status:      toot,
+		Visibility:  pc.Scope,
+		SpoilerText: spolier,
+	})
+	if err != nil {
+		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
+		return "", err
+	}
+	return status.ID, nil
+}
+
 func (bc *BotClient) DeleteToot(id string) error {
 	ctx := context.Background()
 	fbotTootID, err := strconv.ParseInt(id, 10, 64)

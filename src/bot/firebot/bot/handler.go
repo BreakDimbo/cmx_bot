@@ -39,7 +39,8 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
 		}
 
-		id, _ := botClient.Post(tootToPost)
+		// id, _ := botClient.Post(tootToPost)
+		id, _ := botClient.PostSensetive(filter(toot.SpoilerText), tootToPost, toot.Sensitive)
 
 		err := bredis.Client.Set(string(toot.ID), string(id), con.TootIDRedisTimeout).Err()
 		if err != nil {
