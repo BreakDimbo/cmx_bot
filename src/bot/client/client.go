@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/sethgrid/pester"
 )
 
 type BotClient struct {
@@ -103,10 +104,18 @@ func downloadPic(remoteURL string) (localURL string) {
 	defer out.Close()
 
 	// Get the data
-	resp, err := http.Get(remoteURL)
+
+	client := pester.New()
+	client.Concurrency = 3
+	client.MaxRetries = 5
+	client.Backoff = pester.ExponentialBackoff
+	client.KeepLog = true
+
+	resp, err := client.Get(remoteURL)
 	if err != nil {
 		zlog.SLogger.Error(err)
 	}
+
 	defer resp.Body.Close()
 
 	// Write the body to file

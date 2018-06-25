@@ -68,6 +68,12 @@
   version = "v1.1"
 
 [[projects]]
+  name = "github.com/sethgrid/pester"
+  packages = ["."]
+  revision = "03e26c9abbbf5accb8349790bf9f41bde09d72c3"
+  version = "1.0.0"
+
+[[projects]]
   name = "github.com/tomnomnom/linkheader"
   packages = ["."]
   revision = "6953a30d444317754766fccdd3f7f000edc874f6"
@@ -110,6 +116,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "980a3f54a9e491cbed168b3f57935f8b51038be112feb0c90d6c939ae9d1491c"
+  inputs-digest = "56a730488fb29bfb9de110fc4982746f9905c4d56fad4e722b4528b79a1307b6"
   solver-name = "gps-cdcl"
   solver-version = 1
