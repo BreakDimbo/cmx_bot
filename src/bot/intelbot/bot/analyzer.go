@@ -103,9 +103,8 @@ func analyze(interval string) (toot string, hideToot string) {
 
 	if interval == con.AnalyzeIntervalDaily {
 		t := findMostShiningToot(publicToots)
-		toot = toot + fmt.Sprintf("7.昨日最✨嘟嘟来自：%s·%s，转嘟%d次，收藏%d次。\n", t.Account.DisplayName,
-			t.Account.Username, t.ReblogsCount, t.FavouritesCount)
-		hideToot = filter(t.Content) + fmt.Sprintf("\n🔗：%s", t.URL)
+		toot = toot + fmt.Sprintf("7.昨日最✨嘟嘟来自：%s·%s，转嘟%d次，收藏%d次, 🔗:%s \n", t.Account.DisplayName,
+			t.Account.Username, t.ReblogsCount, t.FavouritesCount, t.URL)
 	}
 	return toot, hideToot
 }
