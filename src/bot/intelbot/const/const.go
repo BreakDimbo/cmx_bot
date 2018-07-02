@@ -17,8 +17,9 @@ const (
 )
 
 const (
-	AnalyzeIntervalDaily  = "daily"
-	AnalyzeIntervalWeekly = "weekly"
+	AnalyzeIntervalDaily   = "daily"
+	AnalyzeIntervalWeekly  = "weekly"
+	AnalyzeIntervalMonthly = "monthly"
 )
 
 var Emoji []string

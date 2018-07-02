@@ -19,6 +19,9 @@ func Start() {
 		crontab.AddFunc(cronConfig.WeeklyTime, func() {
 			bot.WeeklyPost()
 		})
+		crontab.AddFunc(cronConfig.MonthlyTime, func() {
+			bot.MonthlyPost()
+		})
 		crontab.AddFunc(cronConfig.CleanUnfollower, func() {
 			bot.CleanUnfollower()
 		})

@@ -43,10 +43,14 @@ func WeeklyAnalyze() string {
 	return t
 }
 
+func MonthlyAnalyze() string {
+	t, _ := analyze(con.AnalyzeIntervalMonthly)
+	return t
+}
+
 func analyze(interval string) (toot string, hideToot string) {
 	// TODO: refactor
 	var startTime time.Time
-	var intervalStr string
 	var localHuaLao string
 	var accNameTootsCounts []kvPair
 
@@ -55,10 +59,10 @@ func analyze(interval string) (toot string, hideToot string) {
 	switch interval {
 	case con.AnalyzeIntervalDaily:
 		startTime = toTime.Add((-24 + config.Timezone) * time.Hour)
-		intervalStr = "昨日"
 	case con.AnalyzeIntervalWeekly:
 		startTime = toTime.Add((7*-24 + config.Timezone) * time.Hour)
-		intervalStr = "上周"
+	case con.AnalyzeIntervalMonthly:
+		startTime = toTime.Add((30*-24 + config.Timezone) * time.Hour)
 	}
 
 	publicToots := fetchDataByTime(startTime, toTime, con.ScopeTypePublic)
@@ -97,21 +101,33 @@ func analyze(interval string) (toot string, hideToot string) {
 	r1 := rand.New(s1)
 	emoji := con.Emoji[r1.Intn(len(con.Emoji))]
 
-	toot = parseToToot(intervalStr, wordcounts, publicTootCount,
-		activePersonCount, accNameTootsCounts, emoji, localHuaLao,
-		count, config.FbotName)
-
+	var shiningToot *gomastodon.Status
 	if interval == con.AnalyzeIntervalDaily {
-		t := findMostShiningToot(publicToots)
-		toot = toot + fmt.Sprintf("7.昨日最✨嘟嘟来自：%s·%s，转嘟%d次，收藏%d次, 🔗:%s \n", t.Account.DisplayName,
-			t.Account.Username, t.ReblogsCount, t.FavouritesCount, t.URL)
+		shiningToot = findMostShiningToot(publicToots)
 	}
+
+	toot = parseToToot(interval, wordcounts, publicTootCount,
+		activePersonCount, accNameTootsCounts, emoji, localHuaLao,
+		count, config.FbotName, shiningToot)
+
 	return toot, hideToot
 }
 
-func parseToToot(intervalStr string, wordcounts []kvPair, publicTootCount int,
+func parseToToot(interval string, wordcounts []kvPair, publicTootCount int,
 	activePersonCount int, accNameTootsCounts []kvPair, emoji string, localHuaLao string,
-	huaLaoCount int, firebot string) (toot string) {
+	huaLaoCount int, firebot string, shiningToot *gomastodon.Status) (toot string) {
+
+	var intervalStr string
+	switch interval {
+	case con.AnalyzeIntervalDaily:
+		intervalStr = "昨日"
+	case con.AnalyzeIntervalWeekly:
+		intervalStr = "上周"
+	case con.AnalyzeIntervalMonthly:
+		toot = fmt.Sprintf("%d年%d月最强话唠是：%s,共嘟嘟%d条", time.Now().Year(), int(time.Now().Add(-30*24*time.Hour).Month()),
+			accNameTootsCounts[0].key, accNameTootsCounts[0].count)
+		return
+	}
 	//TODO: use loop
 	keyWordsStr := fmt.Sprintf("1.%s本县关键词前五名：%s(%d) | %s(%d) | %s(%d) | %s(%d) | %s(%d)\n",
 		intervalStr,
@@ -130,7 +146,12 @@ func parseToToot(intervalStr string, wordcounts []kvPair, publicTootCount int,
 	secretaryHuaLaoStr := fmt.Sprintf("5.%s局长眼中话唠：\n%s %s,嘟嘟%d条\n",
 		intervalStr, emoji, localHuaLao, huaLaoCount)
 	secretaryCooperateStr := fmt.Sprintf("6.局长联动：本县入住传火局局长 @%s \n", firebot)
-	return keyWordsStr + tootCountStr + activePersonCountStr + mostActiveRankStr + secretaryHuaLaoStr + secretaryCooperateStr
+	toot = keyWordsStr + tootCountStr + activePersonCountStr + mostActiveRankStr + secretaryHuaLaoStr + secretaryCooperateStr
+	if interval == con.AnalyzeIntervalDaily {
+		toot = toot + fmt.Sprintf("7.昨日最✨嘟嘟来自：%s·%s，转嘟%d次，收藏%d次, 🔗:%s \n", shiningToot.Account.DisplayName,
+			shiningToot.Account.Username, shiningToot.ReblogsCount, shiningToot.FavouritesCount, shiningToot.URL)
+	}
+	return
 }
 
 func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sResult map[string]*indexStatus) {

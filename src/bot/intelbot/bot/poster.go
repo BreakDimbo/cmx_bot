@@ -9,3 +9,8 @@ func WeeklyPost() {
 	status := WeeklyAnalyze()
 	botClient.Post(status)
 }
+
+func MonthlyPost() {
+	status := MonthlyAnalyze()
+	botClient.Post(status)
+}
