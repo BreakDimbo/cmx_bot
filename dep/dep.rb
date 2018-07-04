@@ -31,6 +31,7 @@ def pull_and_compile_restart(services, target, dir)
     puts "start pull #{service} to #{target}"
     mkdir = "intelbot" if service == "bot"
     mkdir = "firebot" if service == "fbot"
+    mkdir = "hbot" if service == "hbot"
 
     raise unless system("ssh #{target} \"cd /home/break/documents/cmx_bot; export GOPATH=/home/break/documents/cmx_bot; git pull; /usr/local/go/bin/go build -o bin/#{service} bot/#{mkdir}\"")
     raise unless system("ssh #{target} \"sudo systemctl stop #{service}.service\"")

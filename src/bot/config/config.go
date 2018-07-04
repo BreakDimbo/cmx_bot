@@ -20,6 +20,7 @@ type TomlConfig struct {
 	PostConfig   postConifg         `toml:"post_config"`
 	IntelBotInfo MastodonClientInfo `toml:"intelbot"`
 	FireBotInfo  MastodonClientInfo `toml:"firebot"`
+	HBotInfo     MastodonClientInfo `toml:"hbot"`
 }
 
 type elastic struct {
@@ -87,4 +88,8 @@ func IntelBotClientInfo() MastodonClientInfo {
 
 func FireBotClientInfo() MastodonClientInfo {
 	return config.FireBotInfo
+}
+
+func HBotClientInfo() MastodonClientInfo {
+	return config.HBotInfo
 }
