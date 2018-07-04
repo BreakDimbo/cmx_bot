@@ -27,7 +27,11 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		tootToPost = firstContent
 
 		// id, _ := botClient.Post(tootToPost)
-		id, _ := botClient.PostSensetiveWithPic(filter(toot.SpoilerText), tootToPost, true, toot.MediaAttachments)
+		spoilerText := filter(toot.SpoilerText)
+		if spoilerText == "" {
+			spoilerText = "学习资料"
+		}
+		id, _ := botClient.PostSensetiveWithPic(spoilerText, tootToPost, toot.Sensitive, toot.MediaAttachments)
 
 		err := bredis.Client.Set(string(toot.ID), string(id), con.TootIDRedisTimeout).Err()
 		if err != nil {
