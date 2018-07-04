@@ -7,6 +7,7 @@ import (
 	"bot/log"
 	"context"
 	"fmt"
+	"html"
 	"regexp"
 	"strings"
 
@@ -83,5 +84,6 @@ func filter(raw string) (polished string) {
 	polished = strings.Replace(polished, "@firebot", "", -1)
 	polished = strings.Replace(polished, "@fbot", "", -1)
 	polished = strings.Replace(polished, "<br/>", "\n", -1)
+	polished = html.UnescapeString(polished)
 	return
 }
