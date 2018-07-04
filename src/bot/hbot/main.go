@@ -1,6 +1,6 @@
 package main
 
-import "bot/firebot/bot"
+import "bot/hbot/bot"
 
 func main() {
 	bot.Lauch()

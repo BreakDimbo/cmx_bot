@@ -2,8 +2,8 @@ package bot
 
 import (
 	"bot/bredis"
-	con "bot/firebot/const"
 	gomastodon "bot/go-mastodon"
+	con "bot/hbot/const"
 	"bot/log"
 	"strings"
 

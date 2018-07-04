@@ -9,7 +9,7 @@ fbot:
 	go build -o bin/fbot bot/firebot
 
 hbot:
-	@echo "Building FirtBot ..."
+	@echo "Building Hbot ..."
 	go build -o bin/hbot bot/hbot
 
 deps:

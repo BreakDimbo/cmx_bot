@@ -1,5 +1,5 @@
 [Unit]
-Description=firebot
+Description=hbot
 After=syslog.target network.target local-fs.target
 
 [Service]
