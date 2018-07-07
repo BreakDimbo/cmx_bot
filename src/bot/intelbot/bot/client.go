@@ -58,6 +58,7 @@ func Lauch() {
 				HandleNotification(e)
 			default:
 				zlog.SLogger.Infof("receive other event: %s", event)
+				os.Exit(0)
 			}
 
 		case event := <-publicCh:
