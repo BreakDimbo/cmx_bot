@@ -7,6 +7,7 @@ import (
 	zlog "bot/log"
 	"context"
 	"log"
+	"os"
 	"sync"
 
 	gomastodon "bot/go-mastodon"
@@ -69,6 +70,7 @@ func Lauch() {
 				HandleDelete(e, con.ScopeTypePublic)
 			default:
 				zlog.SLogger.Infof("receive other event: %s", event)
+				os.Exit(0)
 			}
 		}
 	}
