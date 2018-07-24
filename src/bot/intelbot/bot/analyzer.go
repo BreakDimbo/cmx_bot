@@ -197,7 +197,11 @@ func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Statu
 
 	log.SLogger.Infof("totoal toots num to cal shinging: %d", len(toots))
 	for id, v := range toots {
-		toot, _ := botClient.Normal.GetStatus(ctx, id)
+		toot, err := botClient.Normal.GetStatus(ctx, id)
+		if err != nil {
+			log.SLogger.Errorf("get toot status error: %s", err)
+			continue
+		}
 		(*v).ReblogsCount = toot.ReblogsCount
 		(*v).FavouritesCount = toot.FavouritesCount
 
