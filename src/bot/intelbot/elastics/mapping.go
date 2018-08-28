@@ -79,3 +79,31 @@ const LocalMapping = `
 		}
 	}
 }`
+
+const WikiMapping = `
+{
+	"settings":{
+		"number_of_shards": 1,
+		"number_of_replicas": 0
+	},
+	"mappings":{
+		"wiki":{
+			"properties":{
+				"id":{
+					"type":"keyword"
+				},
+				"word":{
+					"type":"keyword"
+				},
+				"created_at":{
+					"type":"date"
+				},
+				"content":{
+					"type":"text",
+					"store": true,
+					"fielddata": true
+				}
+			}
+		}
+	}
+}`

@@ -76,5 +76,21 @@ func init() {
 				zlog.SLogger.Warn("createIndex not acknowledged")
 			}
 		}
+
+		wexists, err := Client.IndexExists("wiki").Do(context.Background())
+		if err != nil {
+			log.Fatal(lerr)
+		}
+		if !wexists {
+			// create mapping
+			createIndex, err := Client.CreateIndex("wiki").Body(WikiMapping).Do(context.Background())
+			if err != nil {
+				log.Fatal("create wiki index error ", err)
+			}
+
+			if !createIndex.Acknowledged {
+				zlog.SLogger.Warn("createIndex not acknowledged")
+			}
+		}
 	})
 }

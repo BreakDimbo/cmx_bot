@@ -10,7 +10,7 @@ import (
 	gomastodon "bot/go-mastodon"
 )
 
-var botClient *client.BotClient
+var botClient *client.Bot
 var err error
 
 func init() {

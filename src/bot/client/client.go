@@ -15,13 +15,13 @@ import (
 	"github.com/sethgrid/pester"
 )
 
-type BotClient struct {
+type Bot struct {
 	Normal *gomastodon.Client
 	WS     *gomastodon.WSClient
 }
 
 // New new bot client which should be called only when init
-func New(config *config.MastodonClientInfo) (*BotClient, error) {
+func New(config *config.MastodonClientInfo) (*Bot, error) {
 	c := gomastodon.NewClient(&gomastodon.Config{
 		Server:       config.Sever,
 		ClientID:     config.ID,
@@ -32,11 +32,11 @@ func New(config *config.MastodonClientInfo) (*BotClient, error) {
 		log.Fatalf("[Fatal]: authenticate error of mastodon client: %s\n", err)
 		return nil, err
 	}
-	bc := &BotClient{Normal: c, WS: c.NewWSClient()}
+	bc := &Bot{Normal: c, WS: c.NewWSClient()}
 	return bc, nil
 }
 
-func (bc *BotClient) Post(toot string) (gomastodon.ID, error) {
+func (bc *Bot) Post(toot string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
 		Status:     toot,
@@ -49,7 +49,7 @@ func (bc *BotClient) Post(toot string) (gomastodon.ID, error) {
 	return status.ID, nil
 }
 
-func (bc *BotClient) PostSpoiler(spolier string, toot string) (gomastodon.ID, error) {
+func (bc *Bot) PostSpoiler(spolier string, toot string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
 		Status:      toot,
@@ -63,7 +63,7 @@ func (bc *BotClient) PostSpoiler(spolier string, toot string) (gomastodon.ID, er
 	return status.ID, nil
 }
 
-func (bc *BotClient) PostSensetiveWithPic(spolier string, toot string, sensitive bool, medias []gomastodon.Attachment) (gomastodon.ID, error) {
+func (bc *Bot) PostSensetiveWithPic(spolier string, toot string, sensitive bool, medias []gomastodon.Attachment) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	var mediasID []gomastodon.ID
 
@@ -135,7 +135,7 @@ func removeFile(filepath string) {
 	}
 }
 
-func (bc *BotClient) PostWithPicture(spolier string, toot string) (gomastodon.ID, error) {
+func (bc *Bot) PostWithPicture(spolier string, toot string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
 		Status:      toot,
@@ -149,7 +149,7 @@ func (bc *BotClient) PostWithPicture(spolier string, toot string) (gomastodon.ID
 	return status.ID, nil
 }
 
-func (bc *BotClient) DeleteToot(id string) error {
+func (bc *Bot) DeleteToot(id string) error {
 	ctx := context.Background()
 	fbotTootID, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {

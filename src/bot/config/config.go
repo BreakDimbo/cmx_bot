@@ -21,6 +21,7 @@ type TomlConfig struct {
 	IntelBotInfo MastodonClientInfo `toml:"intelbot"`
 	FireBotInfo  MastodonClientInfo `toml:"firebot"`
 	HBotInfo     MastodonClientInfo `toml:"hbot"`
+	WikiInfo     MastodonClientInfo `toml:"wikibot"`
 }
 
 type elastic struct {
@@ -92,4 +93,8 @@ func FireBotClientInfo() MastodonClientInfo {
 
 func HBotClientInfo() MastodonClientInfo {
 	return config.HBotInfo
+}
+
+func WikiBotClientInfo() MastodonClientInfo {
+	return config.WikiInfo
 }

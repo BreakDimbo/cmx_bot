@@ -4,8 +4,8 @@ require 'rest-client'
 
 LOCAL_URL = "http://localhost:9200"
 REMOTE_URL = "http://47.93.43.59:9201"
-USERNAME = ""
-PASSWORD = ""
+USERNAME = "elastic"
+PASSWORD = "break12345"
 
 
 def update_mapping_add_field(field_name, default_value, index, type)

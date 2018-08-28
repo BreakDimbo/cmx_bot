@@ -2,6 +2,7 @@ bin/*
 pkg/*
 config/production.toml
 config/development.toml
+dep/*
 
 *.out
 *.log

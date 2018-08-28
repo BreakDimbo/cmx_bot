@@ -12,6 +12,10 @@ hbot:
 	@echo "Building Hbot ..."
 	go build -o bin/hbot bot/hbot
 
+wbot:
+	@echo "Building Wbot ..."
+	go build -o bin/wbot bot/wikibot
+
 deps:
 	@echo "Install Installing dependencies"
 	@go get -u github.com/golang/dep/cmd/dep
