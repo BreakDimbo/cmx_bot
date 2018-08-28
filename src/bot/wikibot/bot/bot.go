@@ -63,6 +63,9 @@ func (b *WikiBot) handleNotification(e *gomastodon.NotificationEvent) {
 	if ntf.Type != NtfMention {
 		return
 	}
+	if ntf.Account.Username == "xbot" {
+		return
+	}
 
 	if strings.Contains(ntf.Status.Content, "#") { // add with #xxx
 		kword, article := parseToot(ntf.Status.Content)

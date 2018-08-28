@@ -145,7 +145,7 @@ func parseToToot(interval string, wordcounts []kvPair, publicTootCount int,
 		emoji, accNameTootsCounts[2].key, accNameTootsCounts[2].count)
 	secretaryHuaLaoStr := fmt.Sprintf("5.%s局长眼中话唠：\n%s %s,嘟嘟%d条\n",
 		intervalStr, emoji, localHuaLao, huaLaoCount)
-	secretaryCooperateStr := fmt.Sprintf("6.局长联动：本县入住传火局局长 @%s，扫黄局局长 @hbot \n", firebot)
+	secretaryCooperateStr := fmt.Sprintf("6.局长联动：本县入住传火局局长 @%s，扫黄局局长 @hbot，草莓百科 @wbot \n", firebot)
 	toot = keyWordsStr + tootCountStr + activePersonCountStr + mostActiveRankStr + secretaryHuaLaoStr + secretaryCooperateStr
 	if interval == con.AnalyzeIntervalDaily {
 		toot = toot + fmt.Sprintf("8.昨日最✨嘟嘟来自：%s·%s，转嘟%d次，收藏%d次, 🔗:%s \n", shiningToot.Account.DisplayName,
