@@ -92,6 +92,9 @@ const WikiMapping = `
 				"id":{
 					"type":"keyword"
 				},
+				"url":{
+					"type":"text"
+				},
 				"word":{
 					"type":"keyword"
 				},

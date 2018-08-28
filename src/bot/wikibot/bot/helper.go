@@ -5,11 +5,13 @@ import (
 	zlog "bot/log"
 	"context"
 	"html"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/olivere/elastic"
 )
 
 func parseToot(toot string) (string, string) {
@@ -32,6 +34,7 @@ type indexWiki struct {
 	CreatedAt time.Time `json:"created_at"`
 	Content   string    `json:"content"`
 	Word      string    `json:"word"`
+	Url       string    `json:"url"`
 }
 
 func (w *indexWiki) Store() error {
@@ -48,6 +51,33 @@ func (w *indexWiki) Store() error {
 
 	zlog.SLogger.Infof("indexed status %s to index %s, type %s", p.Id, p.Index, p.Type)
 	return nil
+}
+
+func (w *indexWiki) QueryByWord() []string {
+	urls := make([]string, 1)
+	query := elastic.NewBoolQuery()
+	termQuery := elastic.NewTermQuery("word", w.Word)
+	query = query.Must(termQuery)
+
+	result, err := elastics.Client.Search().
+		Index("wiki").
+		Query(query).
+		Size(10000).
+		Pretty(true).
+		Do(context.Background())
+	if err != nil {
+		zlog.SLogger.Errorf("search from elastic error: %s", err)
+		return nil
+	}
+
+	for _, item := range result.Each(reflect.TypeOf(w)) {
+		i := item.(*indexWiki)
+		urls = append(urls, i.Url)
+	}
+
+	zlog.SLogger.Debugf("query word: %s, result: %v", w.Word, result)
+
+	return urls
 }
 
 func filter(raw string) (polished string) {

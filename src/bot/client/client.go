@@ -36,6 +36,17 @@ func New(config *config.MastodonClientInfo) (*Bot, error) {
 	return bc, nil
 }
 
+func (bc *Bot) RawPost(toot *gomastodon.Toot) (*gomastodon.Status, error) {
+	pc := config.GetPostConfig()
+	toot.Visibility = pc.Scope
+	status, err := bc.Normal.PostStatus(context.Background(), toot)
+	if err != nil {
+		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
+		return nil, err
+	}
+	return status, nil
+}
+
 func (bc *Bot) Post(toot string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{

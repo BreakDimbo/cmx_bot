@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -68,6 +69,7 @@ func (b *WikiBot) handleNotification(e *gomastodon.NotificationEvent) {
 		fromUser := ntf.Account.Username
 		addTime := time.Now().Format("Jan 2 15:04:05")
 		content := fmt.Sprintf("@%s-%s-添加条目：%s\n解释：%s", fromUser, addTime, kword, article)
+
 		// add to elastic
 		wiki := indexWiki{
 			ID:        ntf.ID,
@@ -85,15 +87,40 @@ func (b *WikiBot) handleNotification(e *gomastodon.NotificationEvent) {
 			name-time-添加条目：XXX
 			解释：xxxxxxx
 		*/
-		_, err = b.client.Post(content)
+		toot := &gomastodon.Toot{Status: content}
+		status, err := b.client.RawPost(toot)
 		if err != nil {
 			zlog.SLogger.Errorf("post to mastodon error: %v", err)
 		}
 
-	} else if strings.Contains(ntf.Status.Content, "?") { // query with ?xxx
-		// query from elastic
+		// record toot id
+		wiki.Url = status.URL
+		err = wiki.Store()
+		if err != nil {
+			zlog.SLogger.Errorf("update wiki url error: %v", err)
+		}
 
-		// report to user
+	} else if strings.Contains(ntf.Status.Content, "?") { // query with ?xxx
+		reg := regexp.MustCompile(`^?\S*`)
+		kword := "#" + reg.FindString(filter(ntf.Status.Content))[1:]
+
+		// query from elastic
+		wiki := indexWiki{Word: kword}
+		urls := wiki.QueryByWord()
+		urlsStr := strings.Join(urls, "\n")
+		tootContent := fmt.Sprintf("@%s\n%s", ntf.Account.Username, urlsStr)
+
+		// reply to user
+		toot := &gomastodon.Toot{
+			Status:      tootContent,
+			InReplyToID: ntf.Status.ID,
+			Visibility:  "direct",
+		}
+
+		_, err := b.client.RawPost(toot)
+		if err != nil {
+			zlog.SLogger.Errorf("post to user %s error: %v", ntf.Account.Username, err)
+		}
 	}
 }
 
