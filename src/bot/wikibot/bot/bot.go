@@ -75,7 +75,7 @@ func (b *WikiBot) handleNotification(e *gomastodon.NotificationEvent) {
 
 		// add to elastic
 		wiki := indexWiki{
-			ID:        ntf.ID,
+			ID:        string(ntf.Status.ID),
 			CreatedAt: time.Now(),
 			Word:      kword,
 			Content:   content,
