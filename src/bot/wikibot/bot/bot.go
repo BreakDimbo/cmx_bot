@@ -104,8 +104,13 @@ func (b *WikiBot) handleNotification(e *gomastodon.NotificationEvent) {
 		}
 
 	} else if strings.Contains(ntf.Status.Content, "?") { // query with ?xxx
-		reg := regexp.MustCompile(`^\?\S*`)
-		kword := "#" + reg.FindString(filter(ntf.Status.Content))[1:]
+		reg := regexp.MustCompile(`\?\S*`)
+
+		queryStr := reg.FindString(filter(ntf.Status.Content))
+
+		zlog.SLogger.Debugf("query string: %s", queryStr)
+
+		kword := "#" + strings.Trim(queryStr, "?")
 
 		// query from elastic
 		wiki := indexWiki{Word: kword}

@@ -18,7 +18,7 @@ func parseToot(toot string) (string, string) {
 	toot = filter(toot)
 
 	var kword, article string
-	sharpreg := regexp.MustCompile(`^#\S*`)
+	sharpreg := regexp.MustCompile(`#\S*`)
 	kword = sharpreg.FindString(toot)
 
 	// replace all #xxx
