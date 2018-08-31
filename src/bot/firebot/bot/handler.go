@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"html"
-	"regexp"
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -34,8 +33,6 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		} else if strings.Contains(firstContent, "#树洞") || strings.Contains(filter(toot.SpoilerText), "#树洞") {
 			tootToPost = firstContent
 		} else {
-			reg := regexp.MustCompile("^@[^ ]*")
-			firstContent = reg.ReplaceAllString(firstContent, "")
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
