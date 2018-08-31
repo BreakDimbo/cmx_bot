@@ -7,6 +7,7 @@ import (
 	"bot/log"
 	"context"
 	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -122,7 +123,7 @@ func askForTTs(s string) (string, error) {
 	h := sha1.New()
 	h.Write([]byte(s))
 	bs := h.Sum(nil)
-	filename := string(bs)
+	filename := hex.EncodeToString(bs)
 	content["id"] = filename
 	content["txt"] = s
 	jsonMap, err := json.Marshal(content)
