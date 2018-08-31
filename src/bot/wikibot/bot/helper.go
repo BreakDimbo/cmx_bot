@@ -29,6 +29,18 @@ func parseToot(toot string) (string, string) {
 	return kword, article
 }
 
+func filter(raw string) (polished string) {
+	p := bluemonday.StrictPolicy()
+	p.AllowElements("br")
+	polished = p.Sanitize(raw)
+	polished = strings.Replace(polished, "@firebot", "", -1)
+	polished = strings.Replace(polished, "@fbot", "", -1)
+	polished = strings.Replace(polished, "@wbot", "", -1)
+	polished = strings.Replace(polished, "<br/>", "\n", -1)
+	polished = html.UnescapeString(polished)
+	return
+}
+
 type indexWiki struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -78,16 +90,4 @@ func (w *indexWiki) QueryByWord() []string {
 	zlog.SLogger.Debugf("query word: %s, result: %v", w.Word, result)
 
 	return urls
-}
-
-func filter(raw string) (polished string) {
-	p := bluemonday.StrictPolicy()
-	p.AllowElements("br")
-	polished = p.Sanitize(raw)
-	polished = strings.Replace(polished, "@firebot", "", -1)
-	polished = strings.Replace(polished, "@fbot", "", -1)
-	polished = strings.Replace(polished, "@wbot", "", -1)
-	polished = strings.Replace(polished, "<br/>", "\n", -1)
-	polished = html.UnescapeString(polished)
-	return
 }
