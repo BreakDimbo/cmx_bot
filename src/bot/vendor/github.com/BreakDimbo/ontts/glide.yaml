@@ -1,3 +1,0 @@
-package: ontts
-import:
-- package: github.com/imroc/log
