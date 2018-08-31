@@ -38,10 +38,10 @@ func Lauch() {
 		switch uq.(type) {
 		case *gomastodon.NotificationEvent:
 			e := uq.(*gomastodon.NotificationEvent)
-			go HandleNotification(e)
+			HandleNotification(e)
 		case *gomastodon.DeleteEvent:
 			e := uq.(*gomastodon.DeleteEvent)
-			go HandleDelete(e)
+			HandleDelete(e)
 		default:
 			// zlog.SLogger.Infof("receive other event: %s", uq)
 		}

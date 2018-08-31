@@ -6,12 +6,17 @@ import (
 	gomastodon "bot/go-mastodon"
 	"bot/log"
 	"context"
+	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"html"
+	"os"
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
 )
+
+const TtsDir = "/tmp/tts/"
 
 func HandleNotification(e *gomastodon.NotificationEvent) {
 	var tootToPost string
@@ -23,6 +28,8 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		toot := notify.Status
 		replyToID := notify.Status.InReplyToID
 		firstContent := filter(toot.Content)
+		isTTs := false
+		var filename string
 
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
 			index := strings.Index(firstContent, "县民榜：\n")
@@ -32,14 +39,49 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			tootToPost = fmt.Sprintf("咳咳...注意！%s最活跃（话唠）县民是:%s。", timeRange, tootToPost[:lastIndex+3])
 		} else if strings.Contains(firstContent, "#树洞") || strings.Contains(filter(toot.SpoilerText), "#树洞") {
 			tootToPost = firstContent
+		} else if strings.Contains(firstContent, "#话唠树洞") || strings.Contains(filter(toot.SpoilerText), "#话唠树洞") {
+			isTTs = true
+			filename, err = askForTTs(firstContent)
+			if err != nil {
+				return
+			}
 		} else {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
 		}
 
-		// id, _ := botClient.Post(tootToPost)
-		id, _ := botClient.PostSensetiveWithPic(filter(toot.SpoilerText), tootToPost, toot.Sensitive, toot.MediaAttachments)
+		var id gomastodon.ID
+
+		if isTTs {
+			filepath := TtsDir + filename + ".wav"
+
+			attachment, err := botClient.Normal.UploadMedia(context.Background(), filepath)
+			if err != nil {
+				log.SLogger.Errorf("upload media error: %v", err)
+				return
+			}
+
+			toot := &gomastodon.Toot{
+				MediaIDs: []gomastodon.ID{attachment.ID},
+			}
+
+			status, err := botClient.RawPost(toot)
+			if err != nil {
+				log.SLogger.Errorf("post to mastodon error: %v", err)
+				return
+			}
+
+			id = status.ID
+
+			err = os.Remove(filepath)
+			if err != nil {
+				log.SLogger.Error(err)
+			}
+
+		} else {
+			id, _ = botClient.PostSensetiveWithPic(filter(toot.SpoilerText), tootToPost, toot.Sensitive, toot.MediaAttachments)
+		}
 
 		err := bredis.Client.Set(string(toot.ID), string(id), con.TootIDRedisTimeout).Err()
 		if err != nil {
@@ -73,6 +115,27 @@ func recurToot(tootId interface{}) string {
 		return fmt.Sprintf("@%s:%s// %s", originToot.Account.Acct, polished, recurToot(originToot.InReplyToID))
 	}
 	return ""
+}
+
+func askForTTs(s string) (string, error) {
+	content := make(map[string]string)
+	h := sha1.New()
+	h.Write([]byte(s))
+	bs := h.Sum(nil)
+	filename := string(bs)
+	content["id"] = filename
+	content["txt"] = s
+	jsonMap, err := json.Marshal(content)
+	if err != nil {
+		log.SLogger.Errorf("marshal to json error: %v", err)
+		return "", err
+	}
+	err = bredis.Client.Publish("tts", jsonMap).Err()
+	if err != nil {
+		log.SLogger.Errorf("pub to redis error: %v", err)
+		return "", err
+	}
+	return filename, nil
 }
 
 func filter(raw string) (polished string) {
