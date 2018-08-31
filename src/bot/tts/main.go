@@ -1,14 +1,11 @@
 package main
 
 import (
+	"bot/tts/server"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/BreakDimbo/ontts/server"
-
-	"github.com/imroc/log"
 )
 
 var usageStr = `

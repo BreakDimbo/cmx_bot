@@ -1,15 +1,13 @@
 package server
 
 import (
+	"bot/tts/xf"
 	"encoding/json"
 	"fmt"
 	"os"
 	"time"
 
-	"github.com/BreakDimbo/ontts/xf"
-
 	"github.com/garyburd/redigo/redis"
-	"github.com/imroc/log"
 )
 
 type Server struct {
