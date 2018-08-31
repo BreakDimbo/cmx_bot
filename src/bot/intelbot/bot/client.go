@@ -49,13 +49,13 @@ func Lauch() {
 			switch event.(type) {
 			case *gomastodon.UpdateEvent:
 				e := event.(*gomastodon.UpdateEvent)
-				HandleUpdate(e, con.ScopeTypeLocal)
+				go HandleUpdate(e, con.ScopeTypeLocal)
 			case *gomastodon.DeleteEvent:
 				e := event.(*gomastodon.DeleteEvent)
-				HandleDelete(e, con.ScopeTypeLocal)
+				go HandleDelete(e, con.ScopeTypeLocal)
 			case *gomastodon.NotificationEvent:
 				e := event.(*gomastodon.NotificationEvent)
-				HandleNotification(e)
+				go HandleNotification(e)
 			default:
 				zlog.SLogger.Infof("receive other event: %s", event)
 				os.Exit(0)
@@ -65,10 +65,10 @@ func Lauch() {
 			switch event.(type) {
 			case *gomastodon.UpdateEvent:
 				e := event.(*gomastodon.UpdateEvent)
-				HandleUpdate(e, con.ScopeTypePublic)
+				go HandleUpdate(e, con.ScopeTypePublic)
 			case *gomastodon.DeleteEvent:
 				e := event.(*gomastodon.DeleteEvent)
-				HandleDelete(e, con.ScopeTypePublic)
+				go HandleDelete(e, con.ScopeTypePublic)
 			default:
 				zlog.SLogger.Infof("receive other event: %s", event)
 				os.Exit(0)
