@@ -1,4 +1,5 @@
 export GOPATH := $(CURDIR)
+export LD_LIBRARY_PATH=/Users/break/Documents/Geek/cmx_bot/lib/libmsc.so
 
 bot:
 	@echo "Building CmxBot ..."
