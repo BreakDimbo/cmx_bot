@@ -16,6 +16,10 @@ wbot:
 	@echo "Building Wbot ..."
 	go build -o bin/wbot bot/wikibot
 
+tts:
+	@echo "Building TTS ..."
+	go build -o bin/tts bot/tts
+
 deps:
 	@echo "Install Installing dependencies"
 	@go get -u github.com/golang/dep/cmd/dep
