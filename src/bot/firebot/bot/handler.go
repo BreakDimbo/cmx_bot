@@ -13,6 +13,7 @@ import (
 	"html"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -136,6 +137,7 @@ func askForTTs(s string) (string, error) {
 		log.SLogger.Errorf("pub to redis error: %v", err)
 		return "", err
 	}
+	time.Sleep(1 * time.Second)
 	return filename, nil
 }
 
