@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"html"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -57,6 +58,12 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 
 		if isTTs {
 			filepath := TtsDir + filename + ".wav"
+
+			filepath, err = ffmpegConvert(filepath)
+			if err != nil {
+				log.SLogger.Errorf("convert to mp4 error: %v", err)
+				return
+			}
 
 			attachment, err := botClient.Normal.UploadMedia(context.Background(), filepath)
 			if err != nil {
@@ -139,6 +146,19 @@ func askForTTs(s string) (string, error) {
 	}
 	time.Sleep(1 * time.Second)
 	return filename, nil
+}
+
+func ffmpegConvert(f string) (string, error) {
+	// 执行系统命令
+	// 第一个参数是命令名称
+	// 后面参数可以有多个，命令参数
+	output := strings.Replace(f, ".wav", ".mp4", -1)
+	cmd := exec.Command("ffmpeg", "-i", f, "-vn", "-acodec", "aac", "-strict", "-2", output)
+	// 运行命令
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+	return output, nil
 }
 
 func filter(raw string) (polished string) {
