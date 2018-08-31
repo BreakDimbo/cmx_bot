@@ -21,6 +21,5 @@ deps:
 	@go get -u github.com/golang/dep/cmd/dep
 	cd src/bot; ${GOPATH}/bin/dep init; ${GOPATH}/bin/dep ensure -v
 
-
 get:
 	go get github.com/yanyiwu/gojieba
