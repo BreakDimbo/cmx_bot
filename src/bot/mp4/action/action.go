@@ -41,8 +41,7 @@ func GetMp4TTS(res http.ResponseWriter, req *http.Request) {
 
 	res.Write(buf)
 
-	filepath := "tmp/tts/" + f.Name()
-	err = os.Remove(filepath)
+	err = os.Remove(f.Name())
 	if err != nil {
 		fmt.Printf("remove file error: %v", err)
 	}
