@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -123,9 +124,9 @@ func recurToot(tootId interface{}) string {
 }
 
 func askForTTs(s string) (*os.File, error) {
-	t := string(time.Now().Unix())
+	t := strconv.FormatInt(time.Now().Unix(), 10)
 	secrete := calSig(t)
-	url := fmt.Sprintf("47.93.43.59:5438/mp4_tts?secrete=%s&time=%s", secrete, t)
+	url := fmt.Sprintf("http://47.93.43.59:5438/mp4_tts?secrete=%s&time=%s", secrete, t)
 	body := bytes.NewBuffer([]byte(s))
 
 	res, err := http.Post(url, "text", body)
