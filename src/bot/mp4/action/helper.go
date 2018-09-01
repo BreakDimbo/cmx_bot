@@ -43,7 +43,7 @@ func convertToMp4(fn string) (io.Reader, error) {
 
 	fmt.Printf("output file: %s, fn is : %s\n", output, fn)
 
-	cmd := exec.Command("ffmpeg", "-i", fn, "-i", "desktop-1.jpg", "-acodec", "aac", "-strict", "-2", output)
+	cmd := exec.Command("ffmpeg", "-i", fn, "-i", "/tmp/tts/desktop-1.jpg", "-acodec", "aac", "-strict", "-2", output)
 	// 运行命令
 	if err := cmd.Run(); err != nil {
 		return nil, err
