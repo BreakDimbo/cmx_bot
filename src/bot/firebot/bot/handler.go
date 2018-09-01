@@ -55,6 +55,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		if isTTs {
 			file, err := askForTTs(firstContent)
 			if err != nil {
+				log.SLogger.Errorf("ask for tts error: %v", err)
 				return
 			}
 			defer file.Close()
