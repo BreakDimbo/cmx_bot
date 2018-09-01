@@ -5,14 +5,15 @@ import (
 	con "bot/firebot/const"
 	gomastodon "bot/go-mastodon"
 	"bot/log"
+	"bytes"
 	"context"
 	"crypto/sha1"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"html"
+	"io/ioutil"
+	"net/http"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -32,7 +33,6 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		replyToID := notify.Status.InReplyToID
 		firstContent := filter(toot.Content)
 		isTTs := false
-		var filename string
 
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
 			index := strings.Index(firstContent, "县民榜：\n")
@@ -44,10 +44,6 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			tootToPost = firstContent
 		} else if strings.Contains(firstContent, "#话唠树洞") || strings.Contains(filter(toot.SpoilerText), "#话唠树洞") {
 			isTTs = true
-			filename, err = askForTTs(firstContent)
-			if err != nil {
-				return
-			}
 		} else {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
@@ -57,15 +53,14 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		var id gomastodon.ID
 
 		if isTTs {
-			filepath := TtsDir + filename + ".wav"
-
-			filepath, err = ffmpegConvert(filepath)
+			file, err := askForTTs(firstContent)
 			if err != nil {
-				log.SLogger.Errorf("convert to mp4 error: %v", err)
 				return
 			}
+			defer file.Close()
 
-			attachment, err := botClient.Normal.UploadMedia(context.Background(), filepath)
+			log.SLogger.Debugf("filename is %s", file.Name())
+			attachment, err := botClient.Normal.UploadMedia(context.Background(), file.Name())
 			if err != nil {
 				log.SLogger.Errorf("upload media error: %v", err)
 				return
@@ -83,7 +78,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 
 			id = status.ID
 
-			err = os.Remove(filepath)
+			err = os.Remove(file.Name())
 			if err != nil {
 				log.SLogger.Error(err)
 			}
@@ -126,39 +121,44 @@ func recurToot(tootId interface{}) string {
 	return ""
 }
 
-func askForTTs(s string) (string, error) {
-	content := make(map[string]string)
-	h := sha1.New()
-	h.Write([]byte(s))
-	bs := h.Sum(nil)
-	filename := hex.EncodeToString(bs)
-	content["id"] = filename
-	content["txt"] = s
-	jsonMap, err := json.Marshal(content)
+func askForTTs(s string) (*os.File, error) {
+	t := string(time.Now().Unix())
+	secrete := calSig(t)
+	url := fmt.Sprintf("47.93.43.59:5438/mp4_tts?secrete=%s&time=%s", secrete, t)
+	body := bytes.NewBuffer([]byte(s))
+
+	res, err := http.Post(url, "text", body)
 	if err != nil {
-		log.SLogger.Errorf("marshal to json error: %v", err)
-		return "", err
+		return nil, err
 	}
-	err = bredis.Client.Publish("tts", jsonMap).Err()
+
+	result, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.SLogger.Errorf("pub to redis error: %v", err)
-		return "", err
+		return nil, err
 	}
-	time.Sleep(1 * time.Second)
-	return filename, nil
+	defer res.Body.Close()
+
+	filename := fmt.Sprintf("/tmp/tts/tts%s.mp4", time.Now())
+	f, err := os.Create(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = f.Write(result)
+	if err != nil {
+		return nil, err
+	}
+
+	return f, nil
 }
 
-func ffmpegConvert(f string) (string, error) {
-	// 执行系统命令
-	// 第一个参数是命令名称
-	// 后面参数可以有多个，命令参数
-	output := strings.Replace(f, ".wav", ".mp4", -1)
-	cmd := exec.Command("ffmpeg", "-i", f, "-vn", "-acodec", "aac", "-strict", "-2", output)
-	// 运行命令
-	if err := cmd.Run(); err != nil {
-		return "", err
-	}
-	return output, nil
+func calSig(t string) string {
+	const signature = "a7d040cee7bed322a188c9ec7fd9b8b8b34ac893"
+	h := sha1.New()
+	h.Write([]byte(signature + string(t)))
+	bs := h.Sum(nil)
+	bsStr := hex.EncodeToString(bs)
+	return bsStr
 }
 
 func filter(raw string) (polished string) {
