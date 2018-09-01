@@ -2,7 +2,6 @@ package action
 
 import (
 	"bot/bredis"
-	"bot/log"
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
@@ -24,12 +23,10 @@ func genTTS(s string) (string, error) {
 	content["txt"] = s
 	jsonMap, err := json.Marshal(content)
 	if err != nil {
-		log.SLogger.Errorf("marshal to json error: %v", err)
 		return "", err
 	}
 	err = bredis.Client.Publish("tts", jsonMap).Err()
 	if err != nil {
-		log.SLogger.Errorf("pub to redis error: %v", err)
 		return "", err
 	}
 	time.Sleep(1 * time.Second)
