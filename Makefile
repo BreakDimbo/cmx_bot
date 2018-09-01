@@ -21,6 +21,10 @@ tts:
 	@echo "Building TTS ..."
 	go build -o bin/tts bot/tts
 
+mp4:
+	@echo "Building Mp4Sever ..."
+	go build -o bin/mp4 bot/mp4
+
 deps:
 	@echo "Install Installing dependencies"
 	@go get -u github.com/golang/dep/cmd/dep
