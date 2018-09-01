@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -39,4 +40,10 @@ func GetMp4TTS(res http.ResponseWriter, req *http.Request) {
 	checkErr(err, res)
 
 	res.Write(buf)
+
+	filepath := "tmp/tts/" + f.Name()
+	err = os.Remove(filepath)
+	if err != nil {
+		fmt.Printf("remove file error: %v", err)
+	}
 }

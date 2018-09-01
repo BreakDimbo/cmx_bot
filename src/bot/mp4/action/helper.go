@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -34,7 +33,7 @@ func genTTS(s string) (string, error) {
 	return filename, nil
 }
 
-func convertToMp4(fn string) (io.Reader, error) {
+func convertToMp4(fn string) (*os.File, error) {
 	// 执行系统命令
 	// 第一个参数是命令名称
 	// 后面参数可以有多个，命令参数
@@ -53,6 +52,11 @@ func convertToMp4(fn string) (io.Reader, error) {
 	if err != nil {
 		fmt.Printf("open file %s error :%v", f.Name(), err)
 		return nil, err
+	}
+
+	err = os.Remove(fn)
+	if err != nil {
+		fmt.Printf("remove file error: %v", err)
 	}
 
 	return f, nil
