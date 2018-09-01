@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -38,7 +39,7 @@ func convertToMp4(fn string) (io.Reader, error) {
 	// 第一个参数是命令名称
 	// 后面参数可以有多个，命令参数
 	output := strings.Replace(fn, ".wav", ".mp4", -1)
-	cmd := exec.Command("ffmpeg", "-i", fn, "-vn", "-acodec", "aac", "-strict", "-2", output)
+	cmd := exec.Command("ffmpeg", "-i", fn, "-i", "desktop-1.jpg", "-acodec", "aac", "-strict", "-2", output)
 	// 运行命令
 	if err := cmd.Run(); err != nil {
 		return nil, err
@@ -46,6 +47,7 @@ func convertToMp4(fn string) (io.Reader, error) {
 
 	f, err := os.Open(output)
 	if err != nil {
+		fmt.Printf("open file %s error :%v", f.Name(), err)
 		return nil, err
 	}
 
