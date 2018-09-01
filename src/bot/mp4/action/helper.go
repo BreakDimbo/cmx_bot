@@ -38,8 +38,10 @@ func convertToMp4(fn string) (io.Reader, error) {
 	// 执行系统命令
 	// 第一个参数是命令名称
 	// 后面参数可以有多个，命令参数
-	fn = "/tmp/tts/" + fn
+	fn = "/tmp/tts/" + fn + ".wav"
 	output := strings.Replace(fn, ".wav", ".mp4", -1)
+
+	fmt.Printf("output file: %s, fn is : %s\n", output, fn)
 
 	cmd := exec.Command("ffmpeg", "-i", fn, "-i", "desktop-1.jpg", "-acodec", "aac", "-strict", "-2", output)
 	// 运行命令
