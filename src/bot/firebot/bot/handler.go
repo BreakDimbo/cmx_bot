@@ -70,6 +70,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 
 			toot := &gomastodon.Toot{
 				MediaIDs: []gomastodon.ID{attachment.ID},
+				Status:   "#话唠树洞",
 			}
 
 			status, err := botClient.RawPost(toot)
