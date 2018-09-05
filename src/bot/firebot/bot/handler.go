@@ -55,7 +55,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		var id gomastodon.ID
 
 		if isTTs {
-			file, err := askForTTs(tootToPost)
+			file, err := askForTTs(strings.Replace(tootToPost, "#话唠树洞", "", -1))
 			if err != nil {
 				log.SLogger.Errorf("ask for tts error: %v", err)
 				return
