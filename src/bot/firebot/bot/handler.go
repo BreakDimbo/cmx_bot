@@ -45,6 +45,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			tootToPost = firstContent
 		} else if strings.Contains(firstContent, "#话唠树洞") || strings.Contains(filter(toot.SpoilerText), "#话唠树洞") {
 			isTTs = true
+			tootToPost = firstContent
 		} else {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
@@ -54,7 +55,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		var id gomastodon.ID
 
 		if isTTs {
-			file, err := askForTTs(firstContent)
+			file, err := askForTTs(tootToPost)
 			if err != nil {
 				log.SLogger.Errorf("ask for tts error: %v", err)
 				return
@@ -69,8 +70,9 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			}
 
 			toot := &gomastodon.Toot{
-				MediaIDs: []gomastodon.ID{attachment.ID},
-				Status:   "#话唠树洞",
+				MediaIDs:  []gomastodon.ID{attachment.ID},
+				Status:    tootToPost,
+				Sensitive: true,
 			}
 
 			status, err := botClient.RawPost(toot)
