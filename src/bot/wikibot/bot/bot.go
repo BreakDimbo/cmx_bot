@@ -120,7 +120,7 @@ func (b *WikiBot) addWiki(ntf *gomastodon.Notification) {
 		解释：xxxxxxx
 	*/
 
-	status, err := b.client.PostSensetiveWithPic("", content, false, ntf.Status.MediaAttachments)
+	status, err := b.client.PostSensetiveWithPic("", content, ntf.Status.Sensitive, ntf.Status.MediaAttachments)
 	if err != nil {
 		zlog.SLogger.Errorf("post to mastodon error: %v", err)
 	}
