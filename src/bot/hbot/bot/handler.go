@@ -31,11 +31,11 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		if spoilerText == "" {
 			spoilerText = "学习资料"
 		}
-		id, _ := botClient.PostSensetiveWithPic(spoilerText, tootToPost, toot.Sensitive, toot.MediaAttachments)
+		status, _ := botClient.PostSensetiveWithPic(spoilerText, tootToPost, toot.Sensitive, toot.MediaAttachments)
 
-		err := bredis.Client.Set(string(toot.ID), string(id), con.TootIDRedisTimeout).Err()
+		err := bredis.Client.Set(string(toot.ID), string(status.ID), con.TootIDRedisTimeout).Err()
 		if err != nil {
-			log.SLogger.Errorf("set id: %s to redis error: %s", id, err)
+			log.SLogger.Errorf("set id: %s to redis error: %s", status.ID, err)
 		}
 
 		log.SLogger.Infof("get toots from user id: %s, first toot: %s, tootToPost: %s\n", fromUser.Username, firstContent, tootToPost)

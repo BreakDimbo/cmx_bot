@@ -119,8 +119,8 @@ func (b *WikiBot) addWiki(ntf *gomastodon.Notification) {
 		name-time-添加条目：XXX
 		解释：xxxxxxx
 	*/
-	toot := &gomastodon.Toot{Status: content}
-	status, err := b.client.RawPost(toot)
+
+	status, err := b.client.PostSensetiveWithPic("", content, false, ntf.Status.MediaAttachments)
 	if err != nil {
 		zlog.SLogger.Errorf("post to mastodon error: %v", err)
 	}

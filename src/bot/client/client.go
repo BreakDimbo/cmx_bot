@@ -74,7 +74,7 @@ func (bc *Bot) PostSpoiler(spolier string, toot string) (gomastodon.ID, error) {
 	return status.ID, nil
 }
 
-func (bc *Bot) PostSensetiveWithPic(spolier string, toot string, sensitive bool, medias []gomastodon.Attachment) (gomastodon.ID, error) {
+func (bc *Bot) PostSensetiveWithPic(spolier string, toot string, sensitive bool, medias []gomastodon.Attachment) (*gomastodon.Status, error) {
 	pc := config.GetPostConfig()
 	var mediasID []gomastodon.ID
 
@@ -98,9 +98,9 @@ func (bc *Bot) PostSensetiveWithPic(spolier string, toot string, sensitive bool,
 	})
 	if err != nil {
 		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)
-		return "", err
+		return nil, err
 	}
-	return status.ID, nil
+	return status, nil
 }
 
 func downloadPic(remoteURL string) (localURL string) {
