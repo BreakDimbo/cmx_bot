@@ -253,6 +253,7 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 func addWord(x *gojieba.Jieba) {
 	x.AddWord("夜光内裤")
 	x.AddWord("炼金术士")
+	x.AddWord("鲁便器")
 }
 
 func topN(top int, m map[string]int) (pair []kvPair) {
