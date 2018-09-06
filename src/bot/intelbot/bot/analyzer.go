@@ -223,6 +223,7 @@ func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Statu
 
 func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]int) {
 	x := gojieba.NewJieba()
+	addWord(x)
 	defer x.Free()
 	use_hmm := true
 	wFreMap = make(map[string]int)
@@ -247,6 +248,11 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 		}
 	}
 	return
+}
+
+func addWord(x *gojieba.Jieba) {
+	x.AddWord("夜光内裤")
+	x.AddWord("炼金术士")
 }
 
 func topN(top int, m map[string]int) (pair []kvPair) {
