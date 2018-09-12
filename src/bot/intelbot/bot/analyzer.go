@@ -215,7 +215,7 @@ func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Statu
 			shingNum = n
 			stoot = toot
 		}
-		time.Sleep(2 * time.Second)
+		time.Sleep(1 * time.Second)
 		log.SLogger.Infof("over toot: %d", id)
 	}
 	return
