@@ -17,6 +17,10 @@ wbot:
 	@echo "Building Wbot ..."
 	go build -o bin/wbot bot/wikibot
 
+theater:
+	@echo "Building Theater ..."
+	go build -o bin/theater bot/theater
+
 tts:
 	@echo "Building TTS ..."
 	go build -o bin/tts bot/tts
