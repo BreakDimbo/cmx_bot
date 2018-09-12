@@ -18,11 +18,11 @@ func main() {
 		"ruka",
 		"nyannyan",
 		"suzuha",
-		"maho",
-		"kagari",
-		"yuki",
 		"tennouji",
 		"nae",
+		// "maho",
+		// "kagari",
+		// "yuki",
 	}
 	for _, name := range actorsName {
 		actor := bot.New(name)

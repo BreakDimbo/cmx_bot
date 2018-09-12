@@ -1,6 +1,7 @@
 package cons
 
 const (
+	Stein    = "stein"
 	Okabe    = "okabe"
 	Mayuri   = "mayuri"
 	Itaru    = "itaru"
