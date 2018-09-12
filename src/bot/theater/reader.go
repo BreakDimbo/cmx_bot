@@ -58,7 +58,11 @@ func sendLine(actors map[string]*bot.Actor) {
 			log.SLogger.Errorf("actor %s LineCh blocked with line id: %s", actor.Name, id)
 		}
 
-		time.Sleep(30 * time.Minute)
+		for checkNight() {
+			time.Sleep(5 * time.Minute)
+		}
+
+		time.Sleep(20 * time.Minute)
 	}
 }
 
@@ -106,4 +110,14 @@ func checkActed(ep string, id string) (bool, error) {
 
 	log.SLogger.Errorf("get ep %s with id %s from redis error: %v", ep, id, err)
 	return false, err
+}
+
+func checkNight() bool {
+	now := time.Now()
+	start := 12
+	end := 21
+	if now.Hour() > start && now.Hour() < end {
+		return true
+	}
+	return false
 }
