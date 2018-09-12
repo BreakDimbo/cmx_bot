@@ -257,6 +257,7 @@ func addWord(x *gojieba.Jieba) {
 	x.AddWord("邦站")
 	x.AddWord("草莓县")
 	x.AddWord("炭烧鸡")
+	x.AddWord("吃烧鸡")
 }
 
 func topN(top int, m map[string]int) (pair []kvPair) {
