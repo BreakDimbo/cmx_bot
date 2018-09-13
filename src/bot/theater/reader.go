@@ -117,7 +117,7 @@ func checkActed(ep string, id string) (bool, error) {
 func checkNight() bool {
 	now := time.Now()
 	start := 11
-	end := 20
+	end := 21
 	if now.Hour() > start && now.Hour() < end {
 		return true
 	}
