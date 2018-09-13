@@ -108,12 +108,12 @@ func checkActed(ep string, id *int) (bool, error) {
 		return false, nil
 
 	} else if err == redis.Nil {
+		*id = 1 // reset id to 1
 		err := bredis.Client.Set(key, id, Timeout).Err()
 		if err != nil {
 			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, *id, err)
 			return false, err
 		}
-		*id = 1 // reset id to 1
 		return false, nil
 	}
 
