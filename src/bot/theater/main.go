@@ -20,6 +20,7 @@ func main() {
 		"suzuha",
 		"tennouji",
 		"nae",
+		"nakabachi",
 		// "maho",
 		// "kagari",
 		// "yuki",

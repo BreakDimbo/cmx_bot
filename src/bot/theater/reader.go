@@ -31,31 +31,33 @@ func sendLine(actors map[string]*bot.Actor) {
 
 	defer wg.Done()
 
+	var id int
 	input := bufio.NewScanner(f)
 	for input.Scan() {
+		id++
 		content := input.Text()
-		ep, id, name, line, err := parseText(content)
+		ep, name, line, err := parseText(content)
 		if err != nil {
 			log.SLogger.Errorf("parse text:[%s] error: %v", content, err)
 			continue
 		}
 
-		acted, err := checkActed(ep, id)
+		acted, err := checkActed(ep, strconv.Itoa(id))
 		if acted || err != nil {
 			continue
 		}
 
 		actor, ok := actors[name]
 		if !ok {
-			log.SLogger.Errorf("not find actor by name: %s on line id: %s", name, id)
+			log.SLogger.Errorf("not find actor by name: %s on line id: %d", name, id)
 			continue
 		}
 
 		select {
 		case actor.LineCh <- line:
-			log.SLogger.Infof("acts ep %s id %s", ep, id)
+			log.SLogger.Infof("acts ep %s id %d", ep, id)
 		default:
-			log.SLogger.Errorf("actor %s LineCh blocked with line id: %s", actor.Name, id)
+			log.SLogger.Errorf("actor %s LineCh blocked with line id: %d", actor.Name, id)
 		}
 
 		for checkNight() {
@@ -71,14 +73,14 @@ line example:
 
 ep/id/name/line
 */
-func parseText(content string) (string, string, string, string, error) {
+func parseText(content string) (string, string, string, error) {
 	s := strings.Split(content, "/")
-	if len(s) < 4 {
-		return "", "", "", "", fmt.Errorf("split content [%s] len less 4 error", content)
+	if len(s) < 3 {
+		return "", "", "", fmt.Errorf("split content [%s] len less 3 error", content)
 	}
 
-	ep, id, name, line := s[0], s[1], s[2], s[3]
-	return ep, id, name, line, nil
+	ep, name, line := s[0], s[1], s[2]
+	return ep, name, line, nil
 }
 
 func checkActed(ep string, id string) (bool, error) {
@@ -114,8 +116,8 @@ func checkActed(ep string, id string) (bool, error) {
 
 func checkNight() bool {
 	now := time.Now()
-	start := 12
-	end := 21
+	start := 11
+	end := 20
 	if now.Hour() > start && now.Hour() < end {
 		return true
 	}

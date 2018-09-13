@@ -39,6 +39,7 @@ type TomlConfig struct {
 	ActorK MastodonClientInfo `toml:"actor_k"`
 	ActorL MastodonClientInfo `toml:"actor_l"`
 	ActorM MastodonClientInfo `toml:"actor_m"`
+	ActorN MastodonClientInfo `toml:"actor_n"`
 }
 
 type elastic struct {
@@ -144,6 +145,8 @@ func ActorBotClientInfo(name string) (MastodonClientInfo, error) {
 		return config.ActorL, nil
 	case cons.Nae:
 		return config.ActorM, nil
+	case cons.Nakabachi:
+		return config.ActorN, nil
 	default:
 		return MastodonClientInfo{}, fmt.Errorf("no such actor %s", name)
 	}
