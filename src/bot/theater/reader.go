@@ -49,7 +49,7 @@ func sendLine(actors map[string]*bot.Actor) {
 			continue
 		}
 
-		acted, err := checkActed(ep, &id)
+		acted, err := checkActed(ep, id)
 		if acted || err != nil {
 			continue
 		}
@@ -90,34 +90,33 @@ func parseText(content string) (string, string, string, error) {
 	return ep, name, line, nil
 }
 
-func checkActed(ep string, id *int) (bool, error) {
+func checkActed(ep string, id int) (bool, error) {
 	key := fmt.Sprintf("%s:%s", cons.Stein, ep)
 	value, err := bredis.Client.Get(key).Result()
 	if err == nil {
 		valueInt, _ := strconv.Atoi(value)
 
-		if *id <= valueInt {
+		if id <= valueInt {
 			return true, nil
 		}
 
-		err := bredis.Client.Set(key, *id, Timeout).Err()
+		err := bredis.Client.Set(key, id, Timeout).Err()
 		if err != nil {
-			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, *id, err)
+			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, id, err)
 			return false, err
 		}
 		return false, nil
 
 	} else if err == redis.Nil {
-		*id = 1 // reset id to 1
 		err := bredis.Client.Set(key, id, Timeout).Err()
 		if err != nil {
-			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, *id, err)
+			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, id, err)
 			return false, err
 		}
 		return false, nil
 	}
 
-	log.SLogger.Errorf("get ep %s with id %d from redis error: %v", ep, *id, err)
+	log.SLogger.Errorf("get ep %s with id %d from redis error: %v", ep, id, err)
 	return false, err
 }
 
