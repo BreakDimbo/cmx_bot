@@ -16,6 +16,12 @@ import (
 	"github.com/go-redis/redis"
 )
 
+const (
+	ActInterval = 15 * time.Minute
+	NightStart  = 12
+	NightEnd    = 21
+)
+
 func sendLine(actors map[string]*bot.Actor) {
 	filename := config.ScriptFilePath()
 	f, err := os.Open(filename)
@@ -64,7 +70,7 @@ func sendLine(actors map[string]*bot.Actor) {
 			log.SLogger.Errorf("actor %s LineCh blocked with line id: %d", actor.Name, id)
 		}
 
-		time.Sleep(20 * time.Minute)
+		time.Sleep(ActInterval)
 	}
 }
 
@@ -116,9 +122,8 @@ func checkActed(ep string, id string) (bool, error) {
 
 func checkNight() bool {
 	now := time.Now()
-	start := 11
-	end := 21
-	if now.Hour() > start && now.Hour() < end {
+
+	if now.Hour() >= NightStart && now.Hour() < NightEnd {
 		return true
 	}
 	return false
