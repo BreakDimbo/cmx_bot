@@ -47,6 +47,10 @@ func sendLine(actors map[string]*bot.Actor) {
 			continue
 		}
 
+		for checkNight() {
+			time.Sleep(5 * time.Minute)
+		}
+
 		actor, ok := actors[name]
 		if !ok {
 			log.SLogger.Errorf("not find actor by name: %s on line id: %d", name, id)
@@ -58,10 +62,6 @@ func sendLine(actors map[string]*bot.Actor) {
 			log.SLogger.Infof("acts ep %s id %d", ep, id)
 		default:
 			log.SLogger.Errorf("actor %s LineCh blocked with line id: %d", actor.Name, id)
-		}
-
-		for checkNight() {
-			time.Sleep(5 * time.Minute)
 		}
 
 		time.Sleep(20 * time.Minute)
