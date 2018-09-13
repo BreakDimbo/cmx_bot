@@ -20,6 +20,7 @@ const (
 	ActInterval = 15 * time.Minute
 	NightStart  = 12
 	NightEnd    = 21
+	Timeout     = 365 * 24 * 2 * time.Hour
 )
 
 func sendLine(actors map[string]*bot.Actor) {
@@ -48,7 +49,7 @@ func sendLine(actors map[string]*bot.Actor) {
 			continue
 		}
 
-		acted, err := checkActed(ep, strconv.Itoa(id))
+		acted, err := checkActed(ep, &id)
 		if acted || err != nil {
 			continue
 		}
@@ -89,34 +90,34 @@ func parseText(content string) (string, string, string, error) {
 	return ep, name, line, nil
 }
 
-func checkActed(ep string, id string) (bool, error) {
+func checkActed(ep string, id *int) (bool, error) {
 	key := fmt.Sprintf("%s:%s", cons.Stein, ep)
 	value, err := bredis.Client.Get(key).Result()
 	if err == nil {
 		valueInt, _ := strconv.Atoi(value)
-		idInt, _ := strconv.Atoi(id)
 
-		if idInt <= valueInt {
+		if *id <= valueInt {
 			return true, nil
 		}
 
-		err := bredis.Client.Set(key, id, 7*24*time.Hour).Err()
+		err := bredis.Client.Set(key, *id, Timeout).Err()
 		if err != nil {
-			log.SLogger.Errorf("set ep %s with id %s from redis error: %v", ep, id, err)
+			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, *id, err)
 			return false, err
 		}
 		return false, nil
 
 	} else if err == redis.Nil {
-		err := bredis.Client.Set(key, id, 7*24*time.Hour).Err()
+		err := bredis.Client.Set(key, id, Timeout).Err()
 		if err != nil {
-			log.SLogger.Errorf("set ep %s with id %s from redis error: %v", ep, id, err)
+			log.SLogger.Errorf("set ep %s with id %d from redis error: %v", ep, *id, err)
 			return false, err
 		}
+		*id = 1 // reset id to 1
 		return false, nil
 	}
 
-	log.SLogger.Errorf("get ep %s with id %s from redis error: %v", ep, id, err)
+	log.SLogger.Errorf("get ep %s with id %d from redis error: %v", ep, *id, err)
 	return false, err
 }
 
