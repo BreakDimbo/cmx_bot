@@ -39,6 +39,8 @@ func sendLine(actors map[string]*bot.Actor) {
 	defer wg.Done()
 
 	var id int
+	var prevEp string
+
 	input := bufio.NewScanner(f)
 	for input.Scan() {
 		id++
@@ -47,6 +49,11 @@ func sendLine(actors map[string]*bot.Actor) {
 		if err != nil {
 			log.SLogger.Errorf("parse text:[%s] error: %v", content, err)
 			continue
+		}
+
+		if ep != prevEp {
+			id = 1
+			prevEp = ep
 		}
 
 		acted, err := checkActed(ep, id)
