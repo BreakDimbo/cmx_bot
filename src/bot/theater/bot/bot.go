@@ -34,7 +34,7 @@ func (a *Actor) Act(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for line := range a.LineCh {
-		_, err := a.client.PostSpoiler("来自草莓县石头门bot剧组", line)
+		_, err := a.client.PostSpoiler(line, "来自草莓县石头门bot剧组")
 		if err != nil {
 			log.SLogger.Errorf("%s post line [%s] to mastodon error: %v", a.Name, line, err)
 		}
