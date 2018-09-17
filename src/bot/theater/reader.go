@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	ActInterval = 15 * time.Minute
-	NightStart  = 12
-	NightEnd    = 21
+	ActInterval = 30 * time.Minute
+	NightStart  = 16
+	NightEnd    = 20
 	Timeout     = 365 * 24 * 2 * time.Hour
 )
 
