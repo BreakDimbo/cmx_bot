@@ -55,6 +55,7 @@ func (a *Actor) Act(wg *sync.WaitGroup) {
 			}
 		case accountID := <-a.BlockCh:
 			a.client.BlockAccount(accountID)
+			log.SLogger.Infof("block user %s ok", accountID)
 		case accountID := <-a.UnBlockCh:
 			a.client.UnBlockAccount(accountID)
 		}
@@ -85,6 +86,7 @@ func (a *Actor) ListenAudiences(actors map[string]*Actor) {
 func handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Actor) {
 	n := ntf.Notification
 	content := filter(n.Status.Content)
+	log.SLogger.Infof("get notification: %s", content)
 	switch content {
 	case "一切都是命运石的选择":
 		for _, actor := range actors {
