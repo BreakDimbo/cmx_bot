@@ -33,9 +33,11 @@ func New(name string) *Actor {
 	}
 
 	return &Actor{
-		Name:   name,
-		LineCh: make(chan string),
-		client: c,
+		Name:      name,
+		LineCh:    make(chan string),
+		BlockCh:   make(chan string),
+		UnBlockCh: make(chan string),
+		client:    c,
 	}
 }
 
