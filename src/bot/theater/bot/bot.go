@@ -116,8 +116,9 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			// if the toot is for kurisu and on public then kurisu will reply he(she) on public line
 			if n.Status.Visibility == "public" {
 
+				key := fmt.Sprintf("%s:%s", LoveYouKey, n.Account.Username)
 				// if loved already, toot hentai and return
-				res, err := bredis.Client.Get(LoveYouKey).Result()
+				res, err := bredis.Client.Get(key).Result()
 				if err == nil && res != "" {
 					toot := fmt.Sprintf("@%s %s", n.Account.Username, "够了！变态！")
 					_, err = a.client.Post(toot)
@@ -127,7 +128,7 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 					return
 				}
 
-				err = bredis.Client.Set(LoveYouKey, n.Account.Username, 24*time.Hour).Err()
+				err = bredis.Client.Set(key, n.Account.Username, 24*time.Hour).Err()
 				if err != nil {
 					log.SLogger.Errorf("set key to redis error: %v", err)
 				}
