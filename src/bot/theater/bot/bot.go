@@ -16,7 +16,7 @@ import (
 
 const (
 	LoveYouKey     = "LoveKurisu"
-	LoveYouTimeout = 24 * time.Hour
+	LoveYouTimeout = 12 * time.Hour
 )
 
 type Actor struct {
