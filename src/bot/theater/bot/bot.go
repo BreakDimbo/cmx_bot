@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"bot/bredis"
 	"bot/client"
 	"bot/config"
 	"bot/const"
@@ -10,6 +11,12 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
+)
+
+const (
+	LoveYouKey     = "LoveKurisu"
+	LoveYouTimeout = 24 * time.Hour
 )
 
 type Actor struct {
@@ -106,11 +113,26 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 	} else if strings.Contains(content, "Love_You") {
 		switch a.Name {
 		case cons.Kurisu:
+			loved := true
+			res, err := bredis.Client.Get(LoveYouKey).Result()
+			if err != nil || res == "" {
+				loved = false
+				toot := fmt.Sprintf("@%s %s", n.Account.Username, "够了！变态！")
+				_, err = a.client.Post(toot)
+				if err != nil {
+					log.SLogger.Errorf("kurisu reply to error %v", err)
+				}
+				return
+			}
 			// if the toot is for kurisu and on public then kurisu will reply he(she) on public line
-			if n.Status.Visibility == "public" {
+			if n.Status.Visibility == "public" && !loved {
+				err := bredis.Client.Set(LoveYouKey, n.Account.ID, 24*time.Hour).Err()
+				if err != nil {
+					log.SLogger.Errorf("set key to redis error: %v", err)
+				}
 				reply := selectReply(cons.Kurisu)
 				toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
-				_, err := a.client.Post(toot)
+				_, err = a.client.Post(toot)
 				if err != nil {
 					log.SLogger.Errorf("kurisu reply to error %v", err)
 				}
