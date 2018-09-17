@@ -107,11 +107,13 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 		switch a.Name {
 		case cons.Kurisu:
 			// if the toot is for kurisu and on public then kurisu will reply he(she) on public line
-			reply := selectReply(cons.Kurisu)
-			toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
-			_, err := a.client.Post(toot)
-			if err != nil {
-				log.SLogger.Errorf("kurisu reply to error %v", err)
+			if n.Status.Visibility == "public" {
+				reply := selectReply(cons.Kurisu)
+				toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
+				_, err := a.client.Post(toot)
+				if err != nil {
+					log.SLogger.Errorf("kurisu reply to error %v", err)
+				}
 			}
 		case cons.Okabe:
 			for _, actor := range actors {
