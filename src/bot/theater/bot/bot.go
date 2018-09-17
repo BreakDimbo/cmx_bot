@@ -7,11 +7,9 @@ import (
 	gomastodon "bot/go-mastodon"
 	"bot/log"
 	"context"
-	"html"
+	"fmt"
 	"strings"
 	"sync"
-
-	"github.com/microcosm-cc/bluemonday"
 )
 
 type Actor struct {
@@ -52,7 +50,7 @@ func (a *Actor) Act(wg *sync.WaitGroup) {
 				isContine = false
 				break
 			}
-			_, err := a.client.PostSpoiler(line, "#来自草莓县石头门bot剧组\n 屏蔽所有演员：私信胸针（rintarou）「EL_PSY_CONGROO」")
+			_, err := a.client.PostSpoiler(line, "#来自草莓县石头门bot剧组")
 			if err != nil {
 				log.SLogger.Errorf("%s post line [%s] to mastodon error: %v", a.Name, line, err)
 			}
@@ -79,14 +77,14 @@ func (a *Actor) ListenAudiences(actors map[string]*Actor) {
 		switch ntf.(type) {
 		case *gomastodon.NotificationEvent:
 			n := ntf.(*gomastodon.NotificationEvent)
-			handleNotification(n, actors)
+			a.handleNotification(n, actors)
 		default:
-			// zlog.SLogger.Infof("receive other event: %s", uq)
+			// log.SLogger.Infof("receive other event: %s", uq)
 		}
 	}
 }
 
-func handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Actor) {
+func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Actor) {
 	n := ntf.Notification
 	if n.Status == nil {
 		return
@@ -95,27 +93,35 @@ func handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Ac
 	log.SLogger.Infof("get notification: %s", content)
 
 	if strings.Contains(content, "EL_PSY_CONGROO") {
-		for _, actor := range actors {
-			if actor.Name == cons.Okabe {
-				continue
+		switch a.Name {
+		case cons.Okabe:
+			for _, actor := range actors {
+				if actor.Name == cons.Okabe {
+					continue
+				}
+				actor.BlockCh <- string(n.Account.ID)
+				log.SLogger.Infof("start to block %s", n.Account.ID)
 			}
-			actor.BlockCh <- string(n.Account.ID)
-			log.SLogger.Infof("start to block %s", n.Account.ID)
 		}
 	} else if strings.Contains(content, "Love_You") {
-		for _, actor := range actors {
-			if actor.Name == cons.Okabe {
-				continue
+		switch a.Name {
+		case cons.Kurisu:
+			// if the toot is for kurisu and on public then kurisu will reply he(she) on public line
+			if n.Status.Visibility == "public" {
+				reply := selectReply(cons.Kurisu)
+				toot := fmt.Sprintf("%s @%s %s", n.Account.DisplayName, n.Account.Username, reply)
+				_, err := a.client.Post(toot)
+				if err != nil {
+					log.SLogger.Errorf("kurisu reply to error %v", err)
+				}
 			}
-			actor.UnBlockCh <- string(n.Account.ID)
+		case cons.Okabe:
+			for _, actor := range actors {
+				if actor.Name == cons.Okabe {
+					continue
+				}
+				actor.UnBlockCh <- string(n.Account.ID)
+			}
 		}
 	}
-}
-
-func filter(raw string) (polished string) {
-	p := bluemonday.StrictPolicy()
-	polished = p.Sanitize(raw)
-	polished = strings.Replace(polished, "@rintarou", "", -1)
-	polished = html.UnescapeString(polished)
-	return
 }
