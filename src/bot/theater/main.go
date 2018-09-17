@@ -31,7 +31,7 @@ func main() {
 		actors[name] = actor
 		wg.Add(1)
 		go actor.Act(&wg)
-		if name == cons.Okabe {
+		if name == cons.Okabe || name == cons.Kurisu {
 			go actor.ListenAudiences(actors)
 		}
 	}
