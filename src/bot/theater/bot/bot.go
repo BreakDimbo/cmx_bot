@@ -127,7 +127,7 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 				// 	return
 				// }
 
-				err = bredis.Client.Set(LoveYouKey, n.Account.ID, 24*time.Hour).Err()
+				err := bredis.Client.Set(LoveYouKey, n.Account.ID, 24*time.Hour).Err()
 				if err != nil {
 					log.SLogger.Errorf("set key to redis error: %v", err)
 				}
