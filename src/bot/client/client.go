@@ -47,6 +47,26 @@ func (bc *Bot) RawPost(toot *gomastodon.Toot) (*gomastodon.Status, error) {
 	return status, nil
 }
 
+func (bc *Bot) BlockAccount(accountID string) (gomastodon.ID, error) {
+	id := gomastodon.ID(accountID)
+	status, err := bc.Normal.AccountBlock(context.Background(), id)
+	if err != nil {
+		zlog.SLogger.Errorf("block id: %s error: %s", id, err)
+		return "", err
+	}
+	return status.ID, nil
+}
+
+func (bc *Bot) UnBlockAccount(accountID string) (gomastodon.ID, error) {
+	id := gomastodon.ID(accountID)
+	status, err := bc.Normal.AccountUnblock(context.Background(), id)
+	if err != nil {
+		zlog.SLogger.Errorf("unblock id: %s error: %s", id, err)
+		return "", err
+	}
+	return status.ID, nil
+}
+
 func (bc *Bot) Post(toot string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{

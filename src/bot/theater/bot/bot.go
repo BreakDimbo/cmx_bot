@@ -3,14 +3,22 @@ package bot
 import (
 	"bot/client"
 	"bot/config"
+	"bot/const"
+	gomastodon "bot/go-mastodon"
 	"bot/log"
+	"context"
+	"html"
 	"sync"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type Actor struct {
-	Name   string
-	LineCh chan string
-	client *client.Bot
+	Name      string
+	LineCh    chan string
+	BlockCh   chan string
+	UnBlockCh chan string
+	client    *client.Bot
 }
 
 func New(name string) *Actor {
@@ -32,11 +40,72 @@ func New(name string) *Actor {
 
 func (a *Actor) Act(wg *sync.WaitGroup) {
 	defer wg.Done()
+	isContine := true
 
-	for line := range a.LineCh {
-		_, err := a.client.PostSpoiler(line, "#来自草莓县石头门bot剧组")
-		if err != nil {
-			log.SLogger.Errorf("%s post line [%s] to mastodon error: %v", a.Name, line, err)
+	for isContine {
+		select {
+		case line, ok := <-a.LineCh:
+			if !ok {
+				isContine = false
+				break
+			}
+			_, err := a.client.PostSpoiler(line, "#来自草莓县石头门bot剧组")
+			if err != nil {
+				log.SLogger.Errorf("%s post line [%s] to mastodon error: %v", a.Name, line, err)
+			}
+		case accountID := <-a.BlockCh:
+			a.client.BlockAccount(accountID)
+		case accountID := <-a.UnBlockCh:
+			a.client.UnBlockAccount(accountID)
 		}
 	}
+}
+
+func (a *Actor) ListenAudiences(actors map[string]*Actor) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	userCh, err := a.client.WS.StreamingWSUser(ctx)
+	if err != nil {
+		log.SLogger.Errorf("new user ws connction error: %s", err)
+		return
+	}
+	defer close(userCh)
+
+	for ntf := range userCh {
+		switch ntf.(type) {
+		case *gomastodon.NotificationEvent:
+			n := ntf.(*gomastodon.NotificationEvent)
+			handleNotification(n, actors)
+		default:
+			// zlog.SLogger.Infof("receive other event: %s", uq)
+		}
+	}
+}
+
+func handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Actor) {
+	n := ntf.Notification
+	content := filter(n.Status.Content)
+	switch content {
+	case "一切都是命运是的选择":
+		for _, actor := range actors {
+			if actor.Name == cons.Okabe {
+				continue
+			}
+			actor.BlockCh <- string(n.Account.ID)
+		}
+	case "爱你":
+		for _, actor := range actors {
+			if actor.Name == cons.Okabe {
+				continue
+			}
+			actor.UnBlockCh <- string(n.Account.ID)
+		}
+	}
+}
+
+func filter(raw string) (polished string) {
+	p := bluemonday.StrictPolicy()
+	polished = p.Sanitize(raw)
+	polished = html.UnescapeString(polished)
+	return
 }

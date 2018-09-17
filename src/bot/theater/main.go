@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bot/const"
 	"bot/theater/bot"
 	"sync"
 )
@@ -30,6 +31,9 @@ func main() {
 		actors[name] = actor
 		wg.Add(1)
 		go actor.Act(&wg)
+		if name == cons.Okabe {
+			go actor.ListenAudiences(actors)
+		}
 	}
 
 	wg.Add(1)
