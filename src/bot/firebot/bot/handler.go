@@ -46,6 +46,8 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		} else if strings.Contains(firstContent, "#话唠树洞") || strings.Contains(filter(toot.SpoilerText), "#话唠树洞") {
 			isTTs = true
 			tootToPost = firstContent
+		} else if fromUser.Username == "kurisu" {
+			return
 		} else {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
