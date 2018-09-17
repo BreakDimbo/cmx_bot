@@ -117,17 +117,17 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			if n.Status.Visibility == "public" {
 
 				// if loved already, toot hentai and return
-				// res, err := bredis.Client.Get(LoveYouKey).Result()
-				// if err != nil || res == "" {
-				// 	toot := fmt.Sprintf("@%s %s", n.Account.Username, "够了！变态！")
-				// 	_, err = a.client.Post(toot)
-				// 	if err != nil {
-				// 		log.SLogger.Errorf("kurisu reply to error %v", err)
-				// 	}
-				// 	return
-				// }
+				res, err := bredis.Client.Get(LoveYouKey).Result()
+				if err == nil && res != "" {
+					toot := fmt.Sprintf("@%s %s", n.Account.Username, "够了！变态！")
+					_, err = a.client.Post(toot)
+					if err != nil {
+						log.SLogger.Errorf("kurisu reply to error %v", err)
+					}
+					return
+				}
 
-				err := bredis.Client.Set(LoveYouKey, n.Account.ID, 24*time.Hour).Err()
+				err = bredis.Client.Set(LoveYouKey, n.Account.Username, 24*time.Hour).Err()
 				if err != nil {
 					log.SLogger.Errorf("set key to redis error: %v", err)
 				}
