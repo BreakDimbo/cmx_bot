@@ -52,7 +52,7 @@ func (a *Actor) Act(wg *sync.WaitGroup) {
 				isContine = false
 				break
 			}
-			_, err := a.client.PostSpoiler(line, "#来自草莓县石头门bot剧组")
+			_, err := a.client.PostSpoiler(line, "#来自草莓县石头门bot剧组\n 屏蔽所有演员：私信胸针（rintarou）「EL_PSY_CONGROO」")
 			if err != nil {
 				log.SLogger.Errorf("%s post line [%s] to mastodon error: %v", a.Name, line, err)
 			}
@@ -88,6 +88,9 @@ func (a *Actor) ListenAudiences(actors map[string]*Actor) {
 
 func handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Actor) {
 	n := ntf.Notification
+	if n.Status == nil {
+		return
+	}
 	content := filter(n.Status.Content)
 	log.SLogger.Infof("get notification: %s", content)
 
