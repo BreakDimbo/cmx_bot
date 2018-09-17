@@ -89,14 +89,15 @@ func handleNotification(ntf *gomastodon.NotificationEvent, actors map[string]*Ac
 	content := filter(n.Status.Content)
 	log.SLogger.Infof("get notification: %s", content)
 
-	if strings.Contains(content, "一切都是命运石的选择") {
+	if strings.Contains(content, "EL_PSY_CONGROO") {
 		for _, actor := range actors {
 			if actor.Name == cons.Okabe {
 				continue
 			}
 			actor.BlockCh <- string(n.Account.ID)
+			log.SLogger.Infof("start to block %s", n.Account.ID)
 		}
-	} else if strings.Contains(content, "爱你") {
+	} else if strings.Contains(content, "Love_You") {
 		for _, actor := range actors {
 			if actor.Name == cons.Okabe {
 				continue
