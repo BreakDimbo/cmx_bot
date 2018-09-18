@@ -20,3 +20,9 @@ func filter(raw string) (polished string) {
 	polished = html.UnescapeString(polished)
 	return
 }
+
+func isLoveYou(content string) bool {
+	return strings.Contains(content, "Love_You") || strings.Contains(content, "love you") ||
+		strings.Contains(content, "Love You") || strings.Contains(content, "爱你") || strings.Contains(content, "喜欢你") ||
+		strings.Contains(content, "吃了你") || strings.Contains(content, "好き")
+}

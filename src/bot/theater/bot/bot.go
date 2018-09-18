@@ -16,7 +16,7 @@ import (
 
 const (
 	LoveYouKey     = "LoveKurisu"
-	LoveYouTimeout = 12 * time.Hour
+	LoveYouTimeout = 6 * time.Hour
 )
 
 type Actor struct {
@@ -99,20 +99,29 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 	content := filter(n.Status.Content)
 	log.SLogger.Infof("get notification: %s", content)
 
-	if strings.Contains(content, "EL_PSY_CONGROO") {
-		switch a.Name {
-		case cons.Okabe:
+	switch a.Name {
+	case cons.Okabe:
+		if strings.Contains(content, "EL_PSY_CONGROO") {
+			switch a.Name {
+			case cons.Okabe:
+				for _, actor := range actors {
+					if actor.Name == cons.Okabe {
+						continue
+					}
+					actor.BlockCh <- string(n.Account.ID)
+					log.SLogger.Infof("start to block %s", n.Account.ID)
+				}
+			}
+		} else if strings.Contains(content, "Love_You") {
 			for _, actor := range actors {
 				if actor.Name == cons.Okabe {
 					continue
 				}
-				actor.BlockCh <- string(n.Account.ID)
-				log.SLogger.Infof("start to block %s", n.Account.ID)
+				actor.UnBlockCh <- string(n.Account.ID)
 			}
 		}
-	} else if strings.Contains(content, "Love_You") {
-		switch a.Name {
-		case cons.Kurisu:
+	case cons.Kurisu:
+		if isLoveYou(content) {
 			// if the toot is for kurisu and on public then kurisu will reply he(she) on public line
 			if n.Status.Visibility == "public" {
 
@@ -128,7 +137,7 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 					return
 				}
 
-				err = bredis.Client.Set(key, n.Account.Username, 24*time.Hour).Err()
+				err = bredis.Client.Set(key, n.Account.Username, LoveYouTimeout).Err()
 				if err != nil {
 					log.SLogger.Errorf("set key to redis error: %v", err)
 				}
@@ -138,13 +147,6 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 				if err != nil {
 					log.SLogger.Errorf("kurisu reply to error %v", err)
 				}
-			}
-		case cons.Okabe:
-			for _, actor := range actors {
-				if actor.Name == cons.Okabe {
-					continue
-				}
-				actor.UnBlockCh <- string(n.Account.ID)
 			}
 		}
 	}
