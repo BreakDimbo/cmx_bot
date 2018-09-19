@@ -77,8 +77,6 @@ func sendLine(actors map[string]*bot.Actor) {
 		default:
 			log.SLogger.Errorf("actor %s LineCh blocked with line id: %d", actor.Name, id)
 		}
-
-		time.Sleep(ActInterval)
 	}
 }
 
@@ -106,6 +104,9 @@ func checkActed(ep string, id int) (bool, error) {
 		if id <= valueInt {
 			return true, nil
 		}
+
+		// TODO: improve this place
+		time.Sleep(ActInterval)
 
 		err := bredis.Client.Set(key, id, Timeout).Err()
 		if err != nil {
