@@ -151,7 +151,8 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 		}
 	case cons.Itaru:
 		if strings.Contains(content, "桶子") && n.Status.Visibility == "public" {
-			toot := fmt.Sprintf("@%s %s", n.Account.Username, "我不管，今晚吃炭烧鸡！")
+			reply := selectReply(cons.Itaru)
+			toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
 			_, err := a.client.Post(toot)
 			if err != nil {
 				log.SLogger.Errorf("kurisu reply to error %v", err)
