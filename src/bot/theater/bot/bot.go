@@ -152,7 +152,8 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 	case cons.Itaru:
 		if strings.Contains(content, "#菜谱") {
 			food := strings.Trim(content, "@itaru")
-			food = strings.Trim(food, "#菜谱")
+			i := strings.Index(food, "#菜谱")
+			food = food[i+7:]
 			key := fmt.Sprintf("%s:%s", FoodKey, food)
 			err := bredis.Client.Set(key, "true", 1024*24*time.Hour).Err()
 			if err != nil {
