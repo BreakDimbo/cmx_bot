@@ -167,6 +167,8 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			}
 
 			toot := fmt.Sprintf("@%s %s", n.Account.Username, "乙！")
+			script := fmt.Sprintf("诶嘿嘿，%s 怎么样？", food)
+			iteraSlice = append(iteraSlice, script)
 			_, err = a.client.Post(toot)
 			if err != nil {
 				log.SLogger.Errorf("kurisu reply to error %v", err)
