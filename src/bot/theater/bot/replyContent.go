@@ -303,6 +303,8 @@ func init() {
 	for _, key := range keys {
 		keySlice := strings.Split(key, ":")
 		food := fmt.Sprintf("诶嘿嘿，%s 怎么样？", keySlice[1])
+		log.SLogger.Infof("food initia: %s\n", food)
+
 		foods = append(foods, food)
 	}
 

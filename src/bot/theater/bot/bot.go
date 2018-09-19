@@ -159,6 +159,7 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			}
 		} else if strings.Contains(content, "#菜谱") {
 			food := strings.Trim(content, "#菜谱")
+			food = strings.Trim(food, "@itaru")
 			key := fmt.Sprintf("%s:%s", FoodKey, food)
 			err := bredis.Client.Set(key, "true", 1024*24*time.Hour).Err()
 			if err != nil {
