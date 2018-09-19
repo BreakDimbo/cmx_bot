@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"bot/const"
 	"html"
 	"math/rand"
 	"strings"
@@ -9,8 +10,16 @@ import (
 )
 
 func selectReply(name string) string {
-	index := rand.Intn(len(replySlice))
-	return replySlice[index]
+	switch name {
+	case cons.Kurisu:
+		index := rand.Intn(len(replySlice))
+		return replySlice[index]
+	case cons.Itaru:
+		index := rand.Intn(len(iteraSlice))
+		return iteraSlice[index]
+	default:
+		return ""
+	}
 }
 
 func filter(raw string) (polished string) {
