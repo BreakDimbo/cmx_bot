@@ -157,6 +157,20 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			if err != nil {
 				log.SLogger.Errorf("kurisu reply to error %v", err)
 			}
+		} else if strings.Contains(content, "#菜谱") {
+			food := strings.Trim(content, "#菜谱")
+			key := fmt.Sprintf("%s:%s", FoodKey, food)
+			err := bredis.Client.Set(key, "true", 1024*24*time.Hour).Err()
+			if err != nil {
+				log.SLogger.Errorf("save %s to redis error: %v", key, err)
+				return
+			}
+
+			toot := fmt.Sprintf("@%s %s", n.Account.Username, "乙！")
+			_, err = a.client.Post(toot)
+			if err != nil {
+				log.SLogger.Errorf("kurisu reply to error %v", err)
+			}
 		}
 	}
 }

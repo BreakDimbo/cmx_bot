@@ -1,7 +1,15 @@
 package bot
 
+import (
+	"bot/bredis"
+	"bot/log"
+	"strings"
+)
+
 var replySlice []string
 var iteraSlice []string
+
+const FoodKey = "FoodKey"
 
 func init() {
 	replySlice = []string{
@@ -283,4 +291,18 @@ func init() {
 		"你在说什么我不明白哦",
 		"怎么看都是冷笑话真是非常感谢",
 	}
+
+	keyPattern := FoodKey + "*"
+	keys, err := bredis.Client.Keys(keyPattern).Result()
+	if err != nil {
+		log.SLogger.Errorf("get food key from redis error: %v", err)
+	}
+
+	var food []string
+	for _, key := range keys {
+		keySlice := strings.Split(key, ":")
+		food = append(food, keySlice[1])
+	}
+
+	iteraSlice = append(iteraSlice, food...)
 }
