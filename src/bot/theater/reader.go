@@ -43,6 +43,7 @@ func sendLine(actors map[string]*bot.Actor) {
 
 	input := bufio.NewScanner(f)
 	for input.Scan() {
+		time.Sleep(ActInterval)
 		id++
 		content := input.Text()
 		ep, name, line, err := parseText(content)
@@ -77,8 +78,6 @@ func sendLine(actors map[string]*bot.Actor) {
 		default:
 			log.SLogger.Errorf("actor %s LineCh blocked with line id: %d", actor.Name, id)
 		}
-
-		time.Sleep(ActInterval)
 	}
 }
 
