@@ -299,6 +299,8 @@ func init() {
 		log.SLogger.Errorf("get food key from redis error: %v", err)
 	}
 
+	log.SLogger.Debugf("init get keys %s", keys)
+
 	var foods []string
 	for _, key := range keys {
 		keySlice := strings.Split(key, ":")
