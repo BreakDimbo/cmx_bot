@@ -150,14 +150,7 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			}
 		}
 	case cons.Itaru:
-		if strings.Contains(content, "变态桶子") && n.Status.Visibility == "public" {
-			reply := selectReply(cons.Itaru)
-			toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
-			_, err := a.client.Post(toot)
-			if err != nil {
-				log.SLogger.Errorf("kurisu reply to error %v", err)
-			}
-		} else if strings.Contains(content, "#菜谱") {
+		if strings.Contains(content, "#菜谱") {
 			food := strings.Trim(content, "@itaru")
 			food = strings.Trim(food, "#菜谱")
 			key := fmt.Sprintf("%s:%s", FoodKey, food)
@@ -171,6 +164,13 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 			script := fmt.Sprintf("诶嘿嘿，%s 怎么样？", food)
 			iteraSlice = append(iteraSlice, script)
 			_, err = a.client.Post(toot)
+			if err != nil {
+				log.SLogger.Errorf("kurisu reply to error %v", err)
+			}
+		} else if strings.Contains(content, "桶子") && n.Status.Visibility == "public" {
+			reply := selectReply(cons.Itaru)
+			toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
+			_, err := a.client.Post(toot)
 			if err != nil {
 				log.SLogger.Errorf("kurisu reply to error %v", err)
 			}
