@@ -19,15 +19,17 @@ const (
 	LoveYouTimeout = 6 * time.Hour
 )
 
+type NotificationHandler func(*gomastodon.NotificationEvent, interface{}) error
 type Actor struct {
-	Name      string
-	LineCh    chan string
-	BlockCh   chan string
-	UnBlockCh chan string
-	client    *client.Bot
+	Name       string
+	LineCh     chan string
+	BlockCh    chan string
+	UnBlockCh  chan string
+	NtfHandler []NotificationHandler
+	client     *client.Bot
 }
 
-func New(name string) *Actor {
+func New(name string, handlers []NotificationHandler) *Actor {
 	cfg, err := config.ActorBotClientInfo(name)
 	if err != nil {
 		panic(err)
@@ -38,11 +40,12 @@ func New(name string) *Actor {
 	}
 
 	return &Actor{
-		Name:      name,
-		LineCh:    make(chan string),
-		BlockCh:   make(chan string),
-		UnBlockCh: make(chan string),
-		client:    c,
+		Name:       name,
+		LineCh:     make(chan string),
+		BlockCh:    make(chan string),
+		UnBlockCh:  make(chan string),
+		NtfHandler: handlers,
+		client:     c,
 	}
 }
 
@@ -141,7 +144,7 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 				if err != nil {
 					log.SLogger.Errorf("set key to redis error: %v", err)
 				}
-				reply := selectReply(cons.Kurisu)
+				reply := GetRandomReply(cons.Kurisu)
 				toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
 				_, err = a.client.Post(toot)
 				if err != nil {
@@ -163,13 +166,13 @@ func (a *Actor) handleNotification(ntf *gomastodon.NotificationEvent, actors map
 
 			toot := fmt.Sprintf("@%s %s", n.Account.Username, "乙！")
 			script := fmt.Sprintf("诶嘿嘿，%s 怎么样？", food)
-			iteraSlice = append(iteraSlice, script)
+			AddReply(cons.Itaru, script)
 			_, err = a.client.Post(toot)
 			if err != nil {
 				log.SLogger.Errorf("kurisu reply to error %v", err)
 			}
 		} else if strings.Contains(content, "桶子") && n.Status.Visibility == "public" {
-			reply := selectReply(cons.Itaru)
+			reply := GetRandomReply(cons.Itaru)
 			toot := fmt.Sprintf("@%s %s", n.Account.Username, reply)
 			_, err := a.client.Post(toot)
 			if err != nil {

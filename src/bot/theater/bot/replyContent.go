@@ -2,18 +2,51 @@ package bot
 
 import (
 	"bot/bredis"
+	"bot/const"
 	"bot/log"
 	"fmt"
+	"math/rand"
 	"strings"
+	"sync"
 )
 
-var replySlice []string
-var iteraSlice []string
+var m *sync.Mutex
+var replies map[string][]string
 
 const FoodKey = "FoodKey"
 
 func init() {
-	replySlice = []string{
+	replies = make(map[string][]string)
+	replies[cons.Kurisu] = initKurisuScrip()
+	replies[cons.Itaru] = initItaruScript()
+}
+
+func GetRandomReply(name string) string {
+	m.Lock()
+	defer m.Unlock()
+	rs, ok := replies[name]
+	if !ok {
+		log.SLogger.Errorf("%s key not found.", name)
+		return ""
+	}
+	index := rand.Intn(len(rs))
+	return rs[index]
+}
+
+// AddReply add reply to replies map with lock
+func AddReply(name string, reply string) error {
+	m.Lock()
+	defer m.Unlock()
+	rs, ok := replies[name]
+	if !ok {
+		return fmt.Errorf("%s not exists error", name)
+	}
+	replies[name] = append(rs, reply)
+	return nil
+}
+
+func initKurisuScrip() []string {
+	return []string{
 		"喂，我说你",
 		"那是我的台词",
 		"你知道得还挺多呢。你是哪个大学研究室里的人…",
@@ -95,159 +128,11 @@ func init() {
 		"要求并排走",
 		"给我过来，要摔倒了",
 	}
+}
 
-	iteraSlice = []string{
+func initItaruScript() []string {
+	itaruSlice := []string{
 		"我不管，今晚吃炭烧鸡！",
-		// "诶嘿嘿，我要吃冰淇淋月饼！",
-		// "诶嘿嘿，我要吃灌肠！",
-		// "诶嘿嘿，我要吃烤白薯！",
-		// "煎鸡腿!",
-		// "酱油鸡!",
-		// "鸡胸肉炒饭!",
-		// "日式照烧鸡腿炒饭!",
-		// "什锦鸡腿饭!",
-		// "照烧鸡腿饭!",
-		// "三杯鸡!",
-		// "辣子鸡!",
-		// "口水鸡!",
-		// "左宗棠鸡!",
-		// "啤酒鸡!",
-		// "红葱油淋香鸡!",
-		// "香蒸葱油鸡!",
-		// "锡纸烤鸡翅!",
-		// "红烧鸡翅!",
-		// "菌菇原汁口袋鸡翅!",
-		// "鸡胗炒酸豆角!",
-		// "冬笋火腿鸡汤!",
-		// "宫爆鸡丁!",
-		// "东坡肉!",
-		// "锡纸烤大排!",
-		// "猪排饭!",
-		// "香肠土豆焖饭!",
-		// "芝士泡菜火锅!",
-		// "鱼香肉丝!",
-		// "豆皮包肉!",
-		// "毛豆烧排骨!",
-		// "咸肉菜饭!",
-		// "红烧肉!",
-		// "水煮肉片!",
-		// "猪蹄!",
-		// "翡翠白玉卷!",
-		// "三汁焖锅!",
-		// "红烧排骨!",
-		// "椒盐猪蹄!",
-		// "卤肉!",
-		// "炖猪肘!",
-		// "炖五花肉!",
-		// "锡纸烤大排!",
-		// "酱油猪脸颊肉!",
-		// "啤酒猪蹄!",
-		// "蜜汁叉烧!",
-		// "水晶捆蹄!",
-		// "粉蒸排骨!",
-		// "糖醋排骨!",
-		// "肉末茄子!",
-		// "排骨汤!",
-		// "蒜泥白肉!",
-		// "粉蒸肉!",
-		// "卤肉饭!",
-		// "青椒肉丝!",
-		// "肥肠!",
-		// "红烧冰糖蹄膀!",
-		// "清蒸藕刺丸!",
-		// "珍宝丸子!",
-		// "回锅肉!",
-		// "肉沫豆角!",
-		// "肥牛盖饭!",
-		// "麻辣牛腩!",
-		// "酸汤肥牛!",
-		// "五香牛肉!",
-		// "咖喱牛肉!",
-		// "番茄炖牛腩!",
-		// "牛肉煲仔饭!",
-		// "惠灵顿牛排!",
-		// "牛肉炒芹菜!",
-		// "菠萝滑牛柳!",
-		// "蒜香爆炒小牛排!",
-		// "红焖羊肉!",
-		// "土豆炖牛肉!",
-		// "干炒牛河!",
-		// "水煮牛肉!",
-		// "五香卤蛋!",
-		// "北非蛋!",
-		// "虾仁蒸水蛋!",
-		// "鸡蛋羹!",
-		// "海鲜通心粉!",
-		// "油焖大虾!",
-		// "虾黄豆腐!",
-		// "蒜蓉虾仁!",
-		// "咕咕鸡!",
-		// "麻辣烤鱼!",
-		// "干烧虾!",
-		// "上海熏鱼!",
-		// "海鲜干锅!",
-		// "锡纸烤鲈鱼!",
-		// "锡纸烤大虾!",
-		// "锡纸芦笋三文鱼!",
-		// "凉拌花甲!",
-		// "鲈鱼莼菜脍!",
-		// "酸菜鱼!",
-		// "马赛鱼汤!",
-		// "芥末虾!",
-		// "玉子虾仁!",
-		// "鱿鱼米肠!",
-		// "茄子腊肉清蒸新西兰鳕鱼!",
-		// "糖醋鱼!",
-		// "清蒸鱼!",
-		// "麻辣小龙虾!",
-		// "鲤鱼汤!",
-		// "爆炒鱿鱼!",
-		// "清蒸罗非鱼!",
-		// "香煎金鲳鱼!",
-		// "剁椒鱼头!",
-		// "潮汕蚝仔!",
-		// "松鼠鱼!",
-		// "泰式清蒸柠檬鱼!",
-		// "法式纸封鱼!",
-		// "清蒸鲈鱼!",
-		// "鲫鱼豆腐汤!",
-		// "黑鱼山药汤!",
-		// "烤秋刀鱼!",
-		// "红烧带鱼!",
-		// "虎皮尖椒!",
-		// "游走的牛儿!",
-		// "腌酸豇豆!",
-		// "麻婆豆腐!",
-		// "蒜香茄条!",
-		// "清炒莴苣丝!",
-		// "蒜蓉粉丝蒸娃娃菜!",
-		// "拔丝地瓜!",
-		// "炸茄盒!",
-		// "锡纸烤土豆片!",
-		// "蒜蓉通心菜!",
-		// "风琴培根土豆!",
-		// "酱萝卜!",
-		// "炝拌生菜!",
-		// "上汤白菜!",
-		// "桂花糖藕!",
-		// "茄子凉菜!",
-		// "红烧茄子!",
-		// "香软好味南瓜焖饭!",
-		// "蒸豆腐!",
-		// "千层蛋糕!",
-		// "椰奶冻!",
-		// "炒汤圆!",
-		// "粽子!",
-		// "炸牛奶!",
-		// "姜撞奶!",
-		// "双皮奶!",
-		// "煎饺!",
-		// "炸酱面!",
-		// "馄饨!",
-		// "葱油拌面!",
-		// "炒面!",
-		// "青椒炒皮蛋!",
-		// "冬瓜排骨汤!",
 		"不是嘿客是黑客吧常考",
 		"那些女孩都是我的老婆",
 		"又开始了厨二病。乙！辛苦了",
@@ -299,8 +184,6 @@ func init() {
 		log.SLogger.Errorf("get food key from redis error: %v", err)
 	}
 
-	log.SLogger.Debugf("init get keys %s", keys)
-
 	var foods []string
 	for _, key := range keys {
 		keySlice := strings.Split(key, ":")
@@ -310,5 +193,6 @@ func init() {
 		foods = append(foods, food)
 	}
 
-	iteraSlice = append(iteraSlice, foods...)
+	itaruSlice = append(itaruSlice, foods...)
+	return itaruSlice
 }
