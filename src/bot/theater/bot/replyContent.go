@@ -114,7 +114,6 @@ func initKurisuScrip() []string {
 		"是谁的错啊，谁的",
 		"你现在在哪",
 		"只是问下你在哪里",
-		"连10秒都用不了吧",
 		"好好，行了就算是助手吧",
 		"那么你是？",
 		"多大了",
@@ -188,7 +187,7 @@ func initItaruScript() []string {
 	for _, key := range keys {
 		keySlice := strings.Split(key, ":")
 		food := fmt.Sprintf("诶嘿嘿，%s 怎么样？", keySlice[1])
-		log.SLogger.Infof("food initia: %s\n", food)
+		log.SLogger.Infof("food initia: %s", food)
 
 		foods = append(foods, food)
 	}
