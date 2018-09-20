@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-var m *sync.Mutex
+var mu sync.Mutex
 var replies map[string][]string
 
 const FoodKey = "FoodKey"
@@ -22,8 +22,8 @@ func init() {
 }
 
 func GetRandomReply(name string) string {
-	m.Lock()
-	defer m.Unlock()
+	mu.Lock()
+	defer mu.Unlock()
 	rs, ok := replies[name]
 	if !ok {
 		log.SLogger.Errorf("%s key not found.", name)
@@ -35,8 +35,8 @@ func GetRandomReply(name string) string {
 
 // AddReply add reply to replies map with lock
 func AddReply(name string, reply string) error {
-	m.Lock()
-	defer m.Unlock()
+	mu.Lock()
+	defer mu.Unlock()
 	rs, ok := replies[name]
 	if !ok {
 		return fmt.Errorf("%s not exists error", name)
