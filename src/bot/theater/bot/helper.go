@@ -42,16 +42,16 @@ func isLoved(key string) bool {
 }
 
 func BlockHandler(self *Actor, ntf *gomastodon.Notification, data interface{}) {
-	actors, ok := data.(map[string]*Actor)
-	if !ok {
-		log.SLogger.Errorf("convert data %v to map error", data)
-		return
-	}
-
 	content := filter(ntf.Status.Content)
 	log.SLogger.Infof("get notification: %s", content)
 
 	if strings.Contains(content, "EL_PSY_CONGROO") {
+		actors, ok := data.(map[string]*Actor)
+		if !ok {
+			log.SLogger.Errorf("convert data %v to map error", data)
+			return
+		}
+
 		for _, actor := range actors {
 			if actor.Name == self.Name {
 				continue
@@ -63,16 +63,16 @@ func BlockHandler(self *Actor, ntf *gomastodon.Notification, data interface{}) {
 }
 
 func UnblockHandler(self *Actor, ntf *gomastodon.Notification, data interface{}) {
-	actors, ok := data.(map[string]*Actor)
-	if !ok {
-		log.SLogger.Errorf("convert data %v to map error", data)
-		return
-	}
-
 	content := filter(ntf.Status.Content)
 	log.SLogger.Infof("get notification: %s", content)
 
 	if strings.Contains(content, "Love_You") {
+		actors, ok := data.(map[string]*Actor)
+		if !ok {
+			log.SLogger.Errorf("convert data %v to map error", data)
+			return
+		}
+
 		for _, actor := range actors {
 			if actor.Name == self.Name {
 				continue

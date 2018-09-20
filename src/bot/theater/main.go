@@ -27,7 +27,18 @@ func main() {
 		// "yuki",
 	}
 	for _, name := range actorsName {
-		actor := bot.New(name)
+		var actor *bot.Actor
+		switch name {
+		case cons.Kurisu:
+			actor = bot.New(name, bot.LoveHandler)
+		case cons.Okabe:
+			actor = bot.New(name, bot.BlockHandler, bot.UnblockHandler)
+		case cons.Itaru:
+			actor = bot.New(name, bot.FoodHandler)
+		default:
+			actor = bot.New(name)
+		}
+
 		actors[name] = actor
 		wg.Add(1)
 		go actor.Act(&wg)
