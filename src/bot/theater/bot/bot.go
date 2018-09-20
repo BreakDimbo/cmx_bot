@@ -78,7 +78,12 @@ func (a *Actor) ListenAudiences(actors map[string]*Actor) {
 		case *gomastodon.NotificationEvent:
 			n := ntf.(*gomastodon.NotificationEvent)
 			for _, handler := range a.NtfHandler {
-				handler(a, n.Notification, actors)
+				ntf := n.Notification
+				if ntf.Status == nil {
+					return
+				}
+				log.SLogger.Debugf("start execute handler: %v", handler)
+				handler(a, ntf, actors)
 			}
 		default:
 			// log.SLogger.Infof("receive other event: %s", uq)
