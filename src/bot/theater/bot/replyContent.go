@@ -13,12 +13,11 @@ import (
 var mu sync.Mutex
 var replies map[string][]string
 
-const FoodKey = "FoodKey"
-
 func init() {
 	replies = make(map[string][]string)
 	replies[cons.Kurisu] = initKurisuScrip()
 	replies[cons.Itaru] = initItaruScript()
+	replies[cons.EatSome] = initEatScript()
 }
 
 func GetRandomReply(name string) string {
@@ -130,8 +129,7 @@ func initKurisuScrip() []string {
 }
 
 func initItaruScript() []string {
-	itaruSlice := []string{
-		"我不管，今晚吃炭烧鸡！",
+	return []string{
 		"不是嘿客是黑客吧常考",
 		"那些女孩都是我的老婆",
 		"又开始了厨二病。乙！辛苦了",
@@ -176,8 +174,13 @@ func initItaruScript() []string {
 		"你在说什么我不明白哦",
 		"怎么看都是冷笑话真是非常感谢",
 	}
+}
 
-	keyPattern := FoodKey + "*"
+func initEatScript() []string {
+	eatSlice := []string{
+		"我不管，今晚吃炭烧鸡！",
+	}
+	keyPattern := cons.FoodKey + "*"
 	keys, err := bredis.Client.Keys(keyPattern).Result()
 	if err != nil {
 		log.SLogger.Errorf("get food key from redis error: %v", err)
@@ -192,6 +195,6 @@ func initItaruScript() []string {
 		foods = append(foods, food)
 	}
 
-	itaruSlice = append(itaruSlice, foods...)
-	return itaruSlice
+	eatSlice = append(eatSlice, foods...)
+	return eatSlice
 }

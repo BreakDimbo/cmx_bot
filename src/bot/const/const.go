@@ -17,3 +17,6 @@ const (
 	Nae       = "nae"
 	Nakabachi = "nakabachi"
 )
+
+const FoodKey = "FoodKey"
+const EatSome = "EatSomething"

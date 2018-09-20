@@ -96,26 +96,35 @@ func FoodHandler(self *Actor, ntf *gomastodon.Notification, data interface{}) {
 		// keep diet in redis
 		i := strings.Index(content, "#菜谱")
 		food := content[i+7:]
-		key := fmt.Sprintf("%s:%s", FoodKey, food)
+		key := fmt.Sprintf("%s:%s", cons.FoodKey, food)
 		err := bredis.Client.Set(key, "true", 1024*24*time.Hour).Err()
 		if err != nil {
 			log.SLogger.Errorf("save %s to redis error: %v", key, err)
 			return
 		}
 		script := fmt.Sprintf("诶嘿嘿，%s 怎么样？", food)
-		AddReply(cons.Itaru, script)
+		AddReply(cons.EatSome, script)
 
 		toot := fmt.Sprintf("@%s %s", ntf.Account.Username, "乙！")
 		_, err = self.client.Post(toot)
 		if err != nil {
-			log.SLogger.Errorf("kurisu reply to error %v", err)
+			log.SLogger.Errorf("itaru reply to %s error %v", ntf.Account.Username, err)
 		}
+	} else if strings.Contains(content, "吃啥") || strings.Contains(content, "吃点啥") ||
+		strings.Contains(content, "吃什么") {
+		reply := GetRandomReply(cons.EatSome)
+		toot := fmt.Sprintf("@%s %s", ntf.Account.Username, reply)
+		_, err := self.client.Post(toot)
+		if err != nil {
+			log.SLogger.Errorf("itaru reply to %s error %v", ntf.Account.Username, err)
+		}
+
 	} else if strings.Contains(content, "桶子") && ntf.Status.Visibility == "public" {
 		reply := GetRandomReply(cons.Itaru)
 		toot := fmt.Sprintf("@%s %s", ntf.Account.Username, reply)
 		_, err := self.client.Post(toot)
 		if err != nil {
-			log.SLogger.Errorf("kurisu reply to error %v", err)
+			log.SLogger.Errorf("itaru reply to %s error %v", ntf.Account.Username, err)
 		}
 	}
 }
