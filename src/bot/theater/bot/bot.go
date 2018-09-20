@@ -14,12 +14,7 @@ import (
 	"time"
 )
 
-const (
-	LoveYouKey     = "LoveKurisu"
-	LoveYouTimeout = 6 * time.Hour
-)
-
-type NotificationHandler func(*gomastodon.NotificationEvent, interface{}) error
+type NotificationHandler func(*Actor, *gomastodon.Notification, interface{}) error
 type Actor struct {
 	Name       string
 	LineCh     chan string
