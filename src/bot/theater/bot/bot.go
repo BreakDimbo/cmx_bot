@@ -77,6 +77,9 @@ func (a *Actor) ListenAudiences(actors map[string]*Actor) {
 		switch ntf.(type) {
 		case *gomastodon.NotificationEvent:
 			n := ntf.(*gomastodon.NotificationEvent)
+			if n.Notification.Type != "mention" {
+				return
+			}
 			for _, handler := range a.NtfHandler {
 				ntf := n.Notification
 				if ntf.Status == nil {
