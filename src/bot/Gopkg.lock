@@ -10,6 +10,14 @@
   version = "v0.3.0"
 
 [[projects]]
+  digest = "1:2209584c0f7c9b68c23374e659357ab546e1b70eec2761f03280f69a8fd23d77"
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
+
+[[projects]]
   digest = "1:0594af97b2f4cec6554086eeace6597e20a4b69466eb4ada25adf9f4300dddd2"
   name = "github.com/garyburd/redigo"
   packages = [
@@ -151,9 +159,10 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0516820422512741f45f4e72d4ade116c1d1bf3bb2d846001d42f6787ec00f22"
+  digest = "1:1f51d9eb1de3b6885d418b68c452f8b3f4d08b0afe94e6ec42cddbbf093596e6"
   name = "golang.org/x/net"
   packages = [
+    "context",
     "html",
     "html/atom",
   ]
@@ -165,6 +174,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/BurntSushi/toml",
+    "github.com/cenkalti/backoff",
     "github.com/garyburd/redigo/redis",
     "github.com/go-redis/redis",
     "github.com/gorilla/websocket",

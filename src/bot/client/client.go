@@ -11,7 +11,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/cenkalti/backoff"
 	"github.com/sethgrid/pester"
 )
 
@@ -27,11 +29,19 @@ func New(config *config.MastodonClientInfo) (*Bot, error) {
 		ClientID:     config.ID,
 		ClientSecret: config.Secret,
 	})
-	err := c.Authenticate(context.Background(), config.Email, config.Password)
+
+	clientAuth := func() error {
+		return c.Authenticate(context.Background(), config.Email, config.Password)
+	}
+
+	bkStrategy := backoff.NewExponentialBackOff()
+	bkStrategy.MaxInterval = 1 * time.Hour
+	err := backoff.Retry(clientAuth, bkStrategy)
 	if err != nil {
 		log.Fatalf("[Fatal]: authenticate error of mastodon client: %s\n", err)
 		return nil, err
 	}
+
 	bc := &Bot{Normal: c, WS: c.NewWSClient()}
 	return bc, nil
 }
