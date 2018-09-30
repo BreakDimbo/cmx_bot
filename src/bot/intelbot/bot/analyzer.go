@@ -124,7 +124,7 @@ func parseToToot(interval string, wordcounts []kvPair, publicTootCount int,
 	case con.AnalyzeIntervalWeekly:
 		intervalStr = "上周"
 	case con.AnalyzeIntervalMonthly:
-		toot = fmt.Sprintf("%d年%d月本县最强话唠是：%s,共嘟嘟%d条", time.Now().Year(), int(time.Now().Add(-30*24*time.Hour).Month()),
+		toot = fmt.Sprintf("%d年%d月本县最强话唠是：%s,共嘟嘟%d条", time.Now().Year(), int(time.Now().Month()),
 			accNameTootsCounts[0].key, accNameTootsCounts[0].count)
 		return
 	}
