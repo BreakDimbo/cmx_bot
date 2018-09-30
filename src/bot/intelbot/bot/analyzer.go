@@ -174,7 +174,7 @@ func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sRes
 	searchResult, err := elastics.Client.Search().
 		Index(index).
 		Query(query).
-		Size(90000).
+		Size(10000000).
 		Pretty(true).
 		Do(context.Background())
 	if err != nil {
