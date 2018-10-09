@@ -34,6 +34,8 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		replyToID := notify.Status.InReplyToID
 		firstContent := filter(toot.Content)
 		isTTs := false
+		isForward := false
+		var secondToot *gomastodon.Status
 
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
 			index := strings.Index(firstContent, "县民榜：\n")
@@ -52,6 +54,11 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
+			secondToot, err = botClient.Normal.GetStatus(context.Background(), toot.InReplyToID.(string))
+			if err != nil {
+				log.SLogger.Errorf("get status %d error %s", err)
+			}
+			isForward = true
 		}
 
 		var id gomastodon.ID
@@ -90,6 +97,9 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 				log.SLogger.Error(err)
 			}
 
+		} else if isForward {
+			status, _ := botClient.PostSensetiveWithPic(filter(toot.SpoilerText), tootToPost, toot.Sensitive, secondToot.MediaAttachments)
+			id = status.ID
 		} else {
 			status, _ := botClient.PostSensetiveWithPic(filter(toot.SpoilerText), tootToPost, toot.Sensitive, toot.MediaAttachments)
 			id = status.ID
