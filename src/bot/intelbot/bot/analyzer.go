@@ -58,11 +58,11 @@ func analyze(interval string) (toot string, hideToot string) {
 	toTime := time.Now().Add(config.Timezone * time.Hour)
 	switch interval {
 	case con.AnalyzeIntervalDaily:
-		startTime = toTime.Add((-24 + config.Timezone) * time.Hour)
+		startTime = toTime.Add((-24) * time.Hour)
 	case con.AnalyzeIntervalWeekly:
-		startTime = toTime.Add((7*-24 + config.Timezone) * time.Hour)
+		startTime = toTime.Add((7 * -24) * time.Hour)
 	case con.AnalyzeIntervalMonthly:
-		startTime = toTime.Add((30*-24 + config.Timezone) * time.Hour)
+		startTime = toTime.Add((30 * -24) * time.Hour)
 	}
 
 	publicToots := fetchDataByTime(startTime, toTime, con.ScopeTypePublic)
