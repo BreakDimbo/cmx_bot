@@ -54,9 +54,15 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 			content := recurToot(replyToID)
 			tootToPost = fmt.Sprintf("@%s:%s// %s", fromUser.Acct, firstContent, content)
 			tootToPost = strings.TrimSuffix(tootToPost, "// ")
-			secondToot, err = botClient.Normal.GetStatus(context.Background(), toot.InReplyToID.(string))
-			if err != nil {
-				log.SLogger.Errorf("get status %d error %s", err)
+
+			// there isn't any reply, just a toot needs to be post by firebot
+			if toot.InReplyToID == nil {
+				secondToot = toot
+			} else {
+				secondToot, err = botClient.Normal.GetStatus(context.Background(), toot.InReplyToID.(string))
+				if err != nil {
+					log.SLogger.Errorf("get status %d error %s", err)
+				}
 			}
 			isForward = true
 		}
