@@ -10,7 +10,7 @@ func main() {
 	defer log.Logger.Sync()
 	bot.LoadStopWord()
 	crontab.Start()
-	bot.Lauch()
+	bot.Launch()
 }
 
 /* only used once

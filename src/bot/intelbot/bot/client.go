@@ -3,12 +3,13 @@ package bot
 import (
 	"bot/client"
 	"bot/config"
-	"bot/intelbot/const"
+	con "bot/intelbot/const"
 	zlog "bot/log"
 	"context"
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	gomastodon "bot/go-mastodon"
 )
@@ -27,7 +28,7 @@ func init() {
 	})
 }
 
-func Lauch() {
+func Launch() {
 	ctx, cancel := context.WithCancel(context.Background())
 	publicCh, err := botClient.WS.StreamingWSPublic(ctx, true)
 	if err != nil {
@@ -42,6 +43,21 @@ func Lauch() {
 	}
 
 	defer cancel()
+
+	ntfCh := make(chan struct{})
+
+	go func() {
+		timer := time.NewTimer(65 * time.Minute)
+
+		for {
+			select {
+			case <-ntfCh:
+				timer.Reset(65 * time.Minute)
+			case <-timer.C:
+				panic("timeout for 65 minutes without message")
+			}
+		}
+	}()
 
 	for {
 		select {
@@ -65,6 +81,7 @@ func Lauch() {
 			switch event.(type) {
 			case *gomastodon.UpdateEvent:
 				e := event.(*gomastodon.UpdateEvent)
+				ntfCh <- struct{}{}
 				go HandleUpdate(e, con.ScopeTypePublic)
 			case *gomastodon.DeleteEvent:
 				e := event.(*gomastodon.DeleteEvent)
