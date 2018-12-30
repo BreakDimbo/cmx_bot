@@ -32,7 +32,7 @@ var chartConfig = {
 labels: [],
 datasets: [
    {
-      label: "草莓馅小时嘟嘟量",
+      label: "草莓县县民小时嘟嘟量",
       fill: false,
       lineTension: 0.1,
       backgroundColor: "rgba(75,192,192,0.4)",
@@ -85,7 +85,7 @@ var chartConfigDaily = {
 labels: [],
 datasets: [
    {
-      label: "草莓馅日嘟嘟量",
+      label: "草莓县县民日嘟嘟量",
       fill: false,
       lineTension: 0.1,
       backgroundColor: "rgba(75,192,192,0.4)",
