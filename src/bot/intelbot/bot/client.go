@@ -69,8 +69,8 @@ func Launch() {
 
 	// pusher toot data to monitor
 	go func() {
-		intervalHour := 1 * time.Minute
-		intervalDaily := 5 * time.Minute
+		intervalHour := 60 * time.Minute
+		intervalDaily := 24 * time.Hour
 
 		hourTicker := time.NewTicker(intervalHour)
 		dailyTicker := time.NewTicker(intervalDaily)
