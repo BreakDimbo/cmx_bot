@@ -340,7 +340,9 @@ func drawChart(avatars []kvPair) string {
 		sbc.Bars[i].Label = validLengthFilter(avatars[i].key, 12)
 	}
 
-	filepath := fmt.Sprintf("/Users/break/cmx_pic/%s.png", time.Now())
+	savePicPath := config.SavePicPath()
+
+	filepath := fmt.Sprintf("%s%s.png", savePicPath, time.Now())
 	file, err := os.Create(filepath)
 	if err != nil {
 		log.SLogger.Errorf("create file %s error\n", filepath, err)
