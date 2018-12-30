@@ -64,7 +64,7 @@ func (b *WikiBot) handleNotification(e *gomastodon.NotificationEvent) {
 	if ntf.Type != NtfMention {
 		return
 	}
-	if ntf.Account.Username == "xbot" {
+	if ntf.Account.Username == "xbot" || ntf.Account.Username == "zbot" {
 		return
 	}
 
