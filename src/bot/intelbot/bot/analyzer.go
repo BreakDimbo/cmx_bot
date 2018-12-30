@@ -7,15 +7,20 @@ import (
 	"bot/log"
 	"context"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"reflect"
 	"sort"
 	"time"
 	"unicode"
 
+	"github.com/golang/freetype/truetype"
+
 	gomastodon "bot/go-mastodon"
 
 	"github.com/olivere/elastic"
+	chart "github.com/wcharczuk/go-chart"
 	"github.com/yanyiwu/gojieba"
 )
 
@@ -38,9 +43,8 @@ func DailyAnalyze() (string, string) {
 	return analyze(con.AnalyzeIntervalDaily)
 }
 
-func WeeklyAnalyze() string {
-	t, _ := analyze(con.AnalyzeIntervalWeekly)
-	return t
+func WeeklyAnalyze() (string, string) {
+	return analyze(con.AnalyzeIntervalWeekly)
 }
 
 func MonthlyAnalyze() string {
@@ -75,8 +79,8 @@ func analyze(interval string) (toot string, filepath string) {
 	localTootsCbyP := tootsCountByPerson(localToots)
 	activePersonCount := len(publicTootsCbyP)
 
-	accIDTootsCounts := topN(3, publicTootsCbyP)
-	avatarPics := make(map[string]kvPair)
+	accIDTootsCounts := topN(5, publicTootsCbyP)
+	avatarPics := make([]kvPair, 5)
 	for _, v := range accIDTootsCounts {
 		account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(v.key))
 		if err != nil {
@@ -88,10 +92,9 @@ func analyze(interval string) (toot string, filepath string) {
 		name := fmt.Sprintf("%s·%s", account.DisplayName, account.Username)
 		uesrTootPair := kvPair{key: name, count: v.count}
 		accNameTootsCounts = append(accNameTootsCounts, uesrTootPair)
-		fp := downloadPic(account.Avatar)
-		avatarPics[fp] = uesrTootPair
+		avatarPics = append(avatarPics, uesrTootPair)
 	}
-	picPath := drawAvatar(avatarPics)
+	filepath = drawChart(avatarPics)
 
 	id, count := mostActivePerson(localTootsCbyP)
 	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(id))
@@ -138,15 +141,10 @@ func parseToToot(interval string, wordcounts []kvPair, publicTootCount int,
 		wordcounts[4].key, wordcounts[4].count)
 	tootCountStr := fmt.Sprintf("2.%s本县嘟嘟数：%d\n", intervalStr, publicTootCount)
 	activePersonCountStr := fmt.Sprintf("3.%s本县冒泡人数：%d\n", intervalStr, activePersonCount)
-	mostActiveRankStr := fmt.Sprintf("4.%s最活跃县民榜：\n%s %s,嘟嘟%d条\n%s %s,嘟嘟%d条\n%s %s,嘟嘟%d条\n",
-		intervalStr,
-		emoji, accNameTootsCounts[0].key, accNameTootsCounts[0].count,
-		emoji, accNameTootsCounts[1].key, accNameTootsCounts[1].count,
-		emoji, accNameTootsCounts[2].key, accNameTootsCounts[2].count)
 	secretaryHuaLaoStr := fmt.Sprintf("5.%s局长眼中话唠：\n%s %s,嘟嘟%d条\n",
 		intervalStr, emoji, localHuaLao, huaLaoCount)
 	secretaryCooperateStr := fmt.Sprintf("6.局长联动：本县入住传火局局长 @%s，扫黄局局长 @hbot，草莓百科 @wbot \n", firebot)
-	toot = keyWordsStr + tootCountStr + activePersonCountStr + mostActiveRankStr + secretaryHuaLaoStr + secretaryCooperateStr
+	toot = keyWordsStr + tootCountStr + activePersonCountStr + secretaryHuaLaoStr + secretaryCooperateStr
 	return
 }
 
@@ -258,6 +256,7 @@ func addWord(x *gojieba.Jieba) {
 		"炭烧鸡",
 		"吃烧鸡",
 		"来自草莓县石头门bot剧组",
+		"杀人姬",
 	}
 	for _, word := range words {
 		x.AddWord(word)
@@ -300,6 +299,56 @@ func mostActivePerson(tpMap map[string]int) (id string, tootNum int) {
 	return
 }
 
-func drawAvatar(avatars map[string]kvPair) string {
+func drawChart(avatars []kvPair) string {
+	fontbyte, err := ioutil.ReadFile("/Users/break/Documents/Geek/cmx_bot/src/bot/intelbot/bot/Songti.ttc")
+	if err != nil {
+		log.SLogger.Error(err)
+	}
 
+	font, err := truetype.Parse(fontbyte)
+	if err != nil {
+		log.SLogger.Error(err)
+		return ""
+	}
+
+	sbc := chart.BarChart{
+		Title:      "草莓馅最活跃县民榜",
+		TitleStyle: chart.StyleShow(),
+		Background: chart.Style{
+			Padding: chart.Box{
+				Top: 40,
+			},
+		},
+		Height:   512,
+		BarWidth: 80,
+		XAxis:    chart.StyleShow(),
+		YAxis: chart.YAxis{
+			Style: chart.StyleShow(),
+		},
+		Bars: make([]chart.Value, 5),
+		Font: font,
+	}
+
+	sort.Slice(avatars, func(i, j int) bool {
+		return avatars[i].count > avatars[j].count
+	})
+
+	for i := range sbc.Bars {
+		sbc.Bars[i].Value = float64(avatars[i].count)
+		sbc.Bars[i].Label = validLengthFilter(avatars[i].key, 12)
+	}
+
+	filepath := fmt.Sprintf("/Users/break/cmx_pic/%s.png", time.Now())
+	file, err := os.Create(filepath)
+	if err != nil {
+		log.SLogger.Errorf("create file %s error\n", filepath, err)
+		return ""
+	}
+
+	err = sbc.Render(chart.PNG, file)
+	if err != nil {
+		log.SLogger.Errorf("Error rendering sbc chart: %v\n", err)
+		return ""
+	}
+	return filepath
 }

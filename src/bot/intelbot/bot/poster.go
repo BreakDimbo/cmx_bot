@@ -1,13 +1,13 @@
 package bot
 
 func DailyPost() {
-	status, htoot := DailyAnalyze()
-	botClient.PostSpoiler(status, htoot)
+	status, pic := DailyAnalyze()
+	botClient.PostWithPicture(status, pic)
 }
 
 func WeeklyPost() {
-	status := WeeklyAnalyze()
-	botClient.Post(status)
+	status, pic := WeeklyAnalyze()
+	botClient.PostWithPicture(status, pic)
 }
 
 func MonthlyPost() {

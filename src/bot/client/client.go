@@ -176,7 +176,7 @@ func removeFile(filepath string) {
 	}
 }
 
-func (bc *Bot) PostWithPicture(spolier, toot, fp string) (gomastodon.ID, error) {
+func (bc *Bot) PostWithPicture(toot, fp string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
 	var mediasID []gomastodon.ID
 
@@ -189,10 +189,9 @@ func (bc *Bot) PostWithPicture(spolier, toot, fp string) (gomastodon.ID, error) 
 	removeFile(fp)
 
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
-		Status:      toot,
-		Visibility:  pc.Scope,
-		SpoilerText: spolier,
-		MediaIDs:    mediasID,
+		Status:     toot,
+		Visibility: pc.Scope,
+		MediaIDs:   mediasID,
 	})
 	if err != nil {
 		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)

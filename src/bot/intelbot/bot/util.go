@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/sethgrid/pester"
 )
@@ -14,7 +15,8 @@ func downloadPic(remoteURL string) (localURL string) {
 	// Create the file
 	filenameSlice := strings.Split(remoteURL, "/")
 	filename := filenameSlice[len(filenameSlice)-1]
-	filepath := fmt.Sprintf("/tmp/cmx_pic/%s", filename)
+	filename = strings.Split(filename, "?")[0]
+	filepath := fmt.Sprintf("/Users/break/cmx_pic/%s", filename)
 	out, err := os.Create(filepath)
 	if err != nil {
 		zlog.SLogger.Error(err)
@@ -43,4 +45,12 @@ func downloadPic(remoteURL string) (localURL string) {
 	}
 
 	return filepath
+}
+
+func validLengthFilter(content string, validLength int) string {
+	runeCount := utf8.RuneCountInString(content)
+	if runeCount > validLength {
+		return string([]rune(content)[:validLength])
+	}
+	return content
 }
