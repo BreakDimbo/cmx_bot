@@ -18,6 +18,14 @@
   version = "v2.0.0"
 
 [[projects]]
+  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
   digest = "1:0594af97b2f4cec6554086eeace6597e20a4b69466eb4ada25adf9f4300dddd2"
   name = "github.com/garyburd/redigo"
   packages = [
@@ -73,6 +81,30 @@
   revision = "0c5f50a587ef8d436071b6eebd1cc2a5f13dcea8"
 
 [[projects]]
+  digest = "1:73c5062c19c602b4d279b581b0ee3ffe43f61bfc37e91885b89190154bb5e909"
+  name = "github.com/labstack/echo"
+  packages = [
+    ".",
+    "middleware",
+  ]
+  pruneopts = "UT"
+  revision = "c7eb8da9ec73e78c4f38413f3f835e0cd52c7d72"
+  version = "v3.3.8"
+
+[[projects]]
+  digest = "1:764bce605f1c70823a567ac3205a03e6b7f375ca747d8820fded0b0abddda802"
+  name = "github.com/labstack/gommon"
+  packages = [
+    "bytes",
+    "color",
+    "log",
+    "random",
+  ]
+  pruneopts = "UT"
+  revision = "7fd9f68ece0bcb1a905fac8f1549f0083f71c51b"
+  version = "v0.2.8"
+
+[[projects]]
   branch = "master"
   digest = "1:2da7bec9de8b02fc88298d5b7c3eec18b3d2c114e6739c550f3f99a12eec0bf4"
   name = "github.com/mailru/easyjson"
@@ -84,6 +116,22 @@
   ]
   pruneopts = "UT"
   revision = "9825584555aa620c53c265d4a09ace0df1346fd9"
+
+[[projects]]
+  digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
+  version = "v0.0.9"
+
+[[projects]]
+  digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
+  version = "v0.0.4"
 
 [[projects]]
   branch = "master"
@@ -114,6 +162,14 @@
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:9615019b0ef77e5b32c479843d113f04269bd34bfac992fe127c62962be879e3"
+  name = "github.com/pusher/pusher-http-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "412688bb3aba082ba848395e80f3acf7e735af7d"
+  version = "v1.3.0"
+
+[[projects]]
   digest = "1:ed615c5430ecabbb0fb7629a182da65ecee6523900ac1ac932520860878ffcad"
   name = "github.com/robfig/cron"
   packages = ["."]
@@ -136,6 +192,22 @@
   pruneopts = "UT"
   revision = "6953a30d444317754766fccdd3f7f000edc874f6"
   version = "0.1.0"
+
+[[projects]]
+  digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
+  name = "github.com/valyala/bytebufferpool"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:268b8bce0064e8c057d7b913605459f9a26dcab864c0886a56d196540fbf003f"
+  name = "github.com/valyala/fasttemplate"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
 
 [[projects]]
   digest = "1:cf762a0ce01d48d8ac03f717aa41f66b655abea67c616d89994ce091a2cc6831"
@@ -185,6 +257,21 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:858feb6e9baac61b18ce2bf7a02fee63eb9ecf9ca332962e2d7d8ea60fce03b2"
+  name = "golang.org/x/crypto"
+  packages = [
+    "acme",
+    "acme/autocert",
+    "internal/subtle",
+    "nacl/secretbox",
+    "poly1305",
+    "salsa20/salsa",
+  ]
+  pruneopts = "UT"
+  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+
+[[projects]]
+  branch = "master"
   digest = "1:8aa52c7f7476f9ce660f5db479eb0e19681b58783442f33459954757fc6732fe"
   name = "golang.org/x/image"
   packages = [
@@ -208,6 +295,14 @@
   pruneopts = "UT"
   revision = "1e491301e022f8f977054da4c2d852decd59571f"
 
+[[projects]]
+  branch = "master"
+  digest = "1:5b7594f7c43cb5fc8f31c3f4a9f6a61ee798dbd5fcb36b70cb3d4780aad4c509"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  pruneopts = "UT"
+  revision = "9a3f9b0469bbc6b8802087ae5c0af9f61502de01"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -216,10 +311,14 @@
     "github.com/cenkalti/backoff",
     "github.com/garyburd/redigo/redis",
     "github.com/go-redis/redis",
+    "github.com/golang/freetype/truetype",
     "github.com/gorilla/websocket",
     "github.com/imroc/log",
+    "github.com/labstack/echo",
+    "github.com/labstack/echo/middleware",
     "github.com/microcosm-cc/bluemonday",
     "github.com/olivere/elastic",
+    "github.com/pusher/pusher-http-go",
     "github.com/robfig/cron",
     "github.com/sethgrid/pester",
     "github.com/tomnomnom/linkheader",
