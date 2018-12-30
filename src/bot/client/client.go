@@ -176,12 +176,23 @@ func removeFile(filepath string) {
 	}
 }
 
-func (bc *Bot) PostWithPicture(spolier string, toot string) (gomastodon.ID, error) {
+func (bc *Bot) PostWithPicture(spolier, toot, fp string) (gomastodon.ID, error) {
 	pc := config.GetPostConfig()
+	var mediasID []gomastodon.ID
+
+	attachment, err := bc.Normal.UploadMedia(context.Background(), fp)
+	if err != nil {
+		zlog.SLogger.Errorf("upload pic failed: %s", err)
+		return "", err
+	}
+	mediasID = append(mediasID, gomastodon.ID(attachment.ID))
+	removeFile(fp)
+
 	status, err := bc.Normal.PostStatus(context.Background(), &gomastodon.Toot{
 		Status:      toot,
 		Visibility:  pc.Scope,
 		SpoilerText: spolier,
+		MediaIDs:    mediasID,
 	})
 	if err != nil {
 		zlog.SLogger.Errorf("post toot: %s error: %s", toot, err)

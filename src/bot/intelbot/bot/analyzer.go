@@ -48,7 +48,7 @@ func MonthlyAnalyze() string {
 	return t
 }
 
-func analyze(interval string) (toot string, hideToot string) {
+func analyze(interval string) (toot string, filepath string) {
 	// TODO: refactor
 	var startTime time.Time
 	var localHuaLao string
@@ -76,6 +76,7 @@ func analyze(interval string) (toot string, hideToot string) {
 	activePersonCount := len(publicTootsCbyP)
 
 	accIDTootsCounts := topN(3, publicTootsCbyP)
+	avatarPics := make(map[string]kvPair)
 	for _, v := range accIDTootsCounts {
 		account, err := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(v.key))
 		if err != nil {
@@ -85,8 +86,12 @@ func analyze(interval string) (toot string, hideToot string) {
 			continue
 		}
 		name := fmt.Sprintf("%s·%s", account.DisplayName, account.Username)
-		accNameTootsCounts = append(accNameTootsCounts, kvPair{key: name, count: v.count})
+		uesrTootPair := kvPair{key: name, count: v.count}
+		accNameTootsCounts = append(accNameTootsCounts, uesrTootPair)
+		fp := downloadPic(account.Avatar)
+		avatarPics[fp] = uesrTootPair
 	}
+	picPath := drawAvatar(avatarPics)
 
 	id, count := mostActivePerson(localTootsCbyP)
 	laccount, lerr := botClient.Normal.GetAccount(context.Background(), gomastodon.ID(id))
@@ -101,21 +106,16 @@ func analyze(interval string) (toot string, hideToot string) {
 	r1 := rand.New(s1)
 	emoji := con.Emoji[r1.Intn(len(con.Emoji))]
 
-	var shiningToot *gomastodon.Status
-	// if interval == con.AnalyzeIntervalDaily {
-	// 	shiningToot = findMostShiningToot(publicToots)
-	// }
-
 	toot = parseToToot(interval, wordcounts, publicTootCount,
 		activePersonCount, accNameTootsCounts, emoji, localHuaLao,
-		count, config.FbotName, shiningToot)
+		count, config.FbotName)
 
-	return toot, hideToot
+	return toot, filepath
 }
 
 func parseToToot(interval string, wordcounts []kvPair, publicTootCount int,
 	activePersonCount int, accNameTootsCounts []kvPair, emoji string, localHuaLao string,
-	huaLaoCount int, firebot string, shiningToot *gomastodon.Status) (toot string) {
+	huaLaoCount int, firebot string) (toot string) {
 
 	var intervalStr string
 	switch interval {
@@ -147,10 +147,6 @@ func parseToToot(interval string, wordcounts []kvPair, publicTootCount int,
 		intervalStr, emoji, localHuaLao, huaLaoCount)
 	secretaryCooperateStr := fmt.Sprintf("6.局长联动：本县入住传火局局长 @%s，扫黄局局长 @hbot，草莓百科 @wbot \n", firebot)
 	toot = keyWordsStr + tootCountStr + activePersonCountStr + mostActiveRankStr + secretaryHuaLaoStr + secretaryCooperateStr
-	// if interval == con.AnalyzeIntervalDaily {
-	// 	toot = toot + fmt.Sprintf("8.昨日最✨嘟嘟来自：%s·%s，转嘟%d次，收藏%d次, 🔗:%s \n", shiningToot.Account.DisplayName,
-	// 		shiningToot.Account.Username, shiningToot.ReblogsCount, shiningToot.FavouritesCount, shiningToot.URL)
-	// }
 	return
 }
 
@@ -191,6 +187,7 @@ func fetchDataByTime(startTime time.Time, endTime time.Time, scope string) (sRes
 	return
 }
 
+/*
 func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Status) {
 	ctx := context.Background()
 	shingNum := int64(0)
@@ -220,6 +217,7 @@ func findMostShiningToot(toots map[string]*indexStatus) (stoot *gomastodon.Statu
 	}
 	return
 }
+*/
 
 func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]int) {
 	x := gojieba.NewJieba()
@@ -251,14 +249,19 @@ func calWordFrequency(totalToots map[string]*indexStatus) (wFreMap map[string]in
 }
 
 func addWord(x *gojieba.Jieba) {
-	x.AddWord("夜光内裤")
-	x.AddWord("炼金术士")
-	x.AddWord("鲁便器")
-	x.AddWord("邦站")
-	x.AddWord("草莓县")
-	x.AddWord("炭烧鸡")
-	x.AddWord("吃烧鸡")
-	x.AddWord("来自草莓县石头门bot剧组")
+	words := []string{
+		"夜光内裤",
+		"炼金术士",
+		"鲁便器",
+		"邦站",
+		"草莓县",
+		"炭烧鸡",
+		"吃烧鸡",
+		"来自草莓县石头门bot剧组",
+	}
+	for _, word := range words {
+		x.AddWord(word)
+	}
 }
 
 func topN(top int, m map[string]int) (pair []kvPair) {
@@ -295,4 +298,8 @@ func mostActivePerson(tpMap map[string]int) (id string, tootNum int) {
 		}
 	}
 	return
+}
+
+func drawAvatar(avatars map[string]kvPair) string {
+
 }
