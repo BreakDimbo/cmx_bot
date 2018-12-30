@@ -300,7 +300,8 @@ func mostActivePerson(tpMap map[string]int) (id string, tootNum int) {
 }
 
 func drawChart(avatars []kvPair) string {
-	fontbyte, err := ioutil.ReadFile("/Users/break/Documents/Geek/cmx_bot/src/bot/intelbot/bot/Songti.ttc")
+	fontPath := config.FontPath()
+	fontbyte, err := ioutil.ReadFile(fontPath)
 	if err != nil {
 		log.SLogger.Error(err)
 	}

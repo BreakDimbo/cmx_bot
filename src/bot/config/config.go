@@ -24,7 +24,9 @@ type TomlConfig struct {
 	HBotInfo     MastodonClientInfo `toml:"hbot"`
 	WikiInfo     MastodonClientInfo `toml:"wikibot"`
 
-	ScriptFile string `toml:"script_file"`
+	ScriptFile  string `toml:"script_file"`
+	FontPath    string `toml:"font_path"`
+	PicSavePath string `toml:"pic_save_path"`
 
 	ActorA MastodonClientInfo `toml:"actor_a"`
 	ActorB MastodonClientInfo `toml:"actor_b"`
@@ -154,4 +156,12 @@ func ActorBotClientInfo(name string) (MastodonClientInfo, error) {
 
 func ScriptFilePath() string {
 	return config.ScriptFile
+}
+
+func FontPath() string {
+	return config.FontPath
+}
+
+func SavePicPath() string {
+	return config.PicSavePath
 }

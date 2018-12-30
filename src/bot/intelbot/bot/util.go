@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"bot/config"
 	zlog "bot/log"
 	"fmt"
 	"io"
@@ -16,7 +17,8 @@ func downloadPic(remoteURL string) (localURL string) {
 	filenameSlice := strings.Split(remoteURL, "/")
 	filename := filenameSlice[len(filenameSlice)-1]
 	filename = strings.Split(filename, "?")[0]
-	filepath := fmt.Sprintf("/Users/break/cmx_pic/%s", filename)
+	savePicPath := config.SavePicPath()
+	filepath := fmt.Sprintf("%s%s", savePicPath, filename)
 	out, err := os.Create(filepath)
 	if err != nil {
 		zlog.SLogger.Error(err)
