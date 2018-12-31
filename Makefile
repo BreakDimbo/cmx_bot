@@ -29,6 +29,10 @@ mp4:
 	@echo "Building Mp4Sever ..."
 	go build -o bin/mp4 bot/mp4
 
+monitor:
+	@echo "Building MonitorSever ..."
+	go build -o bin/monitor bot/monitor
+
 deps:
 	@echo "Install Installing dependencies"
 	@go get -u github.com/golang/dep/cmd/dep

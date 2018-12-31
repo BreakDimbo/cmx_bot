@@ -69,7 +69,7 @@ func Launch() {
 
 	// pusher toot data to monitor
 	go func() {
-		intervalHour := 60 * time.Minute
+		intervalHour := 1 * time.Minute
 		intervalDaily := 24 * time.Hour
 
 		hourTicker := time.NewTicker(intervalHour)
@@ -78,19 +78,19 @@ func Launch() {
 		for {
 			select {
 			case <-hourTicker.C:
-				time := fmt.Sprintf("%d:%d", time.Now().Hour(), time.Now().Minute())
+				timestamp := fmt.Sprintf("%d:%d", time.Now().Hour(), time.Now().Minute())
 				newVisitsData := monitor.VisitsData{
 					Count: countHourly,
-					Time:  time,
+					Time:  timestamp,
 				}
 				monitor.Client.Trigger("tootCountHourly", "addNumber", newVisitsData)
 				zlog.SLogger.Debugf("Trigger count %d", countHourly)
 				SetCountHourly(0)
 			case <-dailyTicker.C:
-				time := fmt.Sprintf("%s", time.Now().Weekday().String())
+				timestamp := fmt.Sprintf("%s", time.Now().Weekday().String())
 				newVisitsData := monitor.VisitsData{
 					Count: countDaily,
-					Time:  time,
+					Time:  timestamp,
 				}
 				monitor.Client.Trigger("tootCountDaily", "addNumber", newVisitsData)
 				SetCountDaily(0)

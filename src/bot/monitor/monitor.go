@@ -15,9 +15,13 @@ func Launch() {
 	e.Use(middleware.Recover())
 
 	// Define the HTTP routes
-	e.File("/", "/usr/local/cmx_bot/current/public/index.html")
-	e.File("/style.css", "/usr/local/cmx_bot/current/public/style.css")
-	e.File("/app.js", "/usr/local/cmx_bot/current/public/app.js")
+	// e.File("/", "/usr/local/cmx_bot/current/public/index.html")
+	// e.File("/style.css", "/usr/local/cmx_bot/current/public/style.css")
+	// e.File("/app.js", "/usr/local/cmx_bot/current/public/app.js")
+
+	e.File("/", "public/index.html")
+	e.File("/style.css", "public/style.css")
+	e.File("/app.js", "public/app.js")
 
 	// Start server
 	e.Logger.Fatal(e.Start(":9012"))

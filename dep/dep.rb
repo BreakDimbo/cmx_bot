@@ -34,11 +34,12 @@ def pull_and_compile_restart(services, target, dir)
     mkdir = "hbot" if service == "hbot"
     mkdir = "wikibot" if service == "wbot"
     mkdir = "theater" if service == "theater"
+    mkdir = "monitor" if service == "monitor"
 
     raise unless system("ssh #{target} \"cd /home/break/documents/cmx_bot; export GOPATH=/home/break/documents/cmx_bot; git pull; /usr/local/go/bin/go build -o bin/#{service} bot/#{mkdir}\"")
     raise unless system("ssh #{target} \"sudo systemctl stop #{service}.service\"")
     raise unless system("ssh #{target} \"sudo cp /home/break/documents/cmx_bot/config/steinGate1.1.txt /usr/local/cmx_bot/current/config/steinGate1.1.txt\"") if service == "theater"
-    raise unless system("ssh #{target} \"sudo cp -r /home/break/documents/cmx_bot/public /usr/local/cmx_bot/current/\"") if service == "bot"
+    raise unless system("ssh #{target} \"sudo cp -r /home/break/documents/cmx_bot/public /usr/local/cmx_bot/current/\"") if service == "monitor"
     raise unless system("ssh #{target} \"cp /home/break/documents/cmx_bot/bin/#{service} /usr/local/cmx_bot/current/bin\"")
     raise unless system("ssh #{target} \"sudo systemctl start #{service}.service\"")
     puts "over restart #{service} on #{target}"

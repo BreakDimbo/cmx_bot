@@ -5,6 +5,31 @@ const pusher = new Pusher('ba844c624003f02c6c0f', {
 
 const channel = pusher.subscribe('tootCountHourly');
 
+var HttpClient = function() {
+  this.get = function(aUrl, aCallback) {
+      var anHttpRequest = new XMLHttpRequest();
+      anHttpRequest.onreadystatechange = function() { 
+          if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+              aCallback(anHttpRequest.responseText);
+      }
+
+      anHttpRequest.open( "GET", aUrl, true );            
+      anHttpRequest.send( null );
+  }
+}
+
+var client = new HttpClient();
+client.get('http://127.0.0.1:8085/tootCountHourly', function(response) {
+  var res = JSON.parse(response)
+  res = res.filter(function(e) {return e != null})
+  res = res.reverse()
+  res.forEach(element => {
+    newLineChart.data.labels.push(element.Time);
+    newLineChart.data.datasets[0].data.push(element.Count);
+    newLineChart.update();
+  });
+});
+
 channel.bind('addNumber', data => {
 if (newLineChart.data.labels.length > 15) {
   newLineChart.data.labels.shift();  
@@ -57,6 +82,17 @@ datasets: [
 };
 
 const channelDaily = pusher.subscribe('tootCountDaily');
+
+client.get('http://127.0.0.1:8085/tootCountDaily', function(response) {
+  var res = JSON.parse(response)
+  res = res.filter(function(e) {return e != null})
+  res = res.reverse()
+  res.forEach(element => {
+    newDailyLineChart.data.labels.push(element.Time);
+    newDailyLineChart.data.datasets[0].data.push(element.Count);
+    newDailyLineChart.update();
+  });
+});
 
 channelDaily.bind('addNumber', data => {
 if (newDailyLineChart.data.labels.length > 15) {

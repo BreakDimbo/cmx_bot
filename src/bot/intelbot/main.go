@@ -3,7 +3,6 @@ package main
 import (
 	"bot/intelbot/bot"
 	"bot/intelbot/crontab"
-	"bot/intelbot/monitor"
 	log "bot/log"
 )
 
@@ -11,7 +10,6 @@ func main() {
 	defer log.Logger.Sync()
 	bot.LoadStopWord()
 	crontab.Start()
-	go monitor.Launch()
 	bot.Launch()
 }
 
