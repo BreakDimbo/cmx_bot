@@ -3,7 +3,7 @@ package main
 import (
 	"bot/bredis"
 	"bot/config"
-	"bot/const"
+	cons "bot/const"
 	"bot/log"
 	"bot/theater/bot"
 	"bufio"
@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	ActInterval = 60 * time.Minute
-	NightStart  = 12
+	ActInterval = 30 * time.Second
+	NightStart  = 13
 	NightEnd    = 21
 	Timeout     = 365 * 24 * 2 * time.Hour
 )
