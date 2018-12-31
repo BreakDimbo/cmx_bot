@@ -31,7 +31,7 @@ client.get('http://67.216.197.45:8085/tootCountHourly', function(response) {
 });
 
 channel.bind('addNumber', data => {
-if (newLineChart.data.labels.length > 15) {
+if (newLineChart.data.labels.length > 24) {
   newLineChart.data.labels.shift();  
   newLineChart.data.datasets[0].data.shift();
 }

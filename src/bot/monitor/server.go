@@ -26,11 +26,11 @@ type TootCountData struct {
 }
 
 func handlerHourly(w http.ResponseWriter, r *http.Request) {
-	tcDataSet := make([]*TootCountData, 12)
+	tcDataSet := make([]*TootCountData, 24)
 	cfg := config.IntelBotClientInfo()
 	endTime := time.Now().Add(13 * time.Hour)
 	endTimeForSearch := endTime.Add(cfg.Timezone * time.Hour).Add(-13 * time.Hour)
-	for i := 0; i < 12; i++ {
+	for i := 0; i < 24; i++ {
 		endTime := endTime.Add(time.Duration(int64(-i)) * time.Hour)
 		endTimeForSearch := endTimeForSearch.Add(time.Duration(int64(-i)) * time.Hour)
 		startTimeForSearch := endTimeForSearch.Add(-1 * time.Hour)
