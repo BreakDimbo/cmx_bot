@@ -38,11 +38,7 @@ func HandleNotification(e *gomastodon.NotificationEvent) {
 		var secondToot *gomastodon.Status
 
 		if fromUser.Username == "xbot" || fromUser.Username == "zbot" {
-			index := strings.Index(firstContent, "县民榜：\n")
-			tootToPost = firstContent[index+12:]
-			timeRange := firstContent[index-15 : index-9]
-			lastIndex := strings.Index(tootToPost, "条\n")
-			tootToPost = fmt.Sprintf("咳咳...注意！%s最活跃（话唠）县民是:%s。", timeRange, tootToPost[:lastIndex+3])
+			return
 		} else if strings.Contains(firstContent, "#树洞") || strings.Contains(filter(toot.SpoilerText), "#树洞") {
 			tootToPost = firstContent
 		} else if strings.Contains(firstContent, "#话唠树洞") || strings.Contains(filter(toot.SpoilerText), "#话唠树洞") {
