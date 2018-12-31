@@ -78,7 +78,8 @@ func Launch() {
 		for {
 			select {
 			case <-hourTicker.C:
-				timestamp := fmt.Sprintf("%d:%d", time.Now().Hour(), time.Now().Minute())
+				t := time.Now().Add(13 * time.Hour)
+				timestamp := fmt.Sprintf("%d:%d", t.Hour(), t.Minute())
 				newVisitsData := monitor.VisitsData{
 					Count: countHourly,
 					Time:  timestamp,
@@ -87,7 +88,8 @@ func Launch() {
 				zlog.SLogger.Debugf("Trigger count %d", countHourly)
 				SetCountHourly(0)
 			case <-dailyTicker.C:
-				timestamp := fmt.Sprintf("%s", time.Now().Weekday().String())
+				t := time.Now().Add(13 * time.Hour)
+				timestamp := fmt.Sprintf("%s", t.Weekday().String())
 				newVisitsData := monitor.VisitsData{
 					Count: countDaily,
 					Time:  timestamp,
