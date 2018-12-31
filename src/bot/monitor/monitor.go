@@ -24,6 +24,6 @@ func Launch() {
 	e.File("/app.js", "public/app.js")
 
 	// Start server
-	e.Logger.Fatal(e.Start(":9012"))
+	e.Logger.Fatal(e.Start("127.0.0.1:9012"))
 
 }
