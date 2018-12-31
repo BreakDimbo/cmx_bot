@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	ActInterval = 30 * time.Second
-	NightStart  = 13
+	ActInterval = 60 * time.Minute
+	NightStart  = 12
 	NightEnd    = 21
 	Timeout     = 365 * 24 * 2 * time.Hour
 )
@@ -77,7 +77,6 @@ func sendLine(actors map[string]*bot.Actor) {
 		default:
 			log.SLogger.Errorf("actor %s LineCh blocked with line id: %d", actor.Name, id)
 		}
-		time.Sleep(ActInterval)
 	}
 }
 
@@ -107,7 +106,7 @@ func checkActed(ep string, id int) (bool, error) {
 		}
 
 		// TODO: improve this place
-		// time.Sleep(ActInterval)
+		time.Sleep(ActInterval)
 
 		err := bredis.Client.Set(key, id, Timeout).Err()
 		if err != nil {
