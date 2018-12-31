@@ -19,7 +19,7 @@ var HttpClient = function() {
 }
 
 var client = new HttpClient();
-client.get('http://127.0.0.1:8085/tootCountHourly', function(response) {
+client.get('http://67.216.197.45:8085/tootCountHourly', function(response) {
   var res = JSON.parse(response)
   res = res.filter(function(e) {return e != null})
   res = res.reverse()
@@ -83,7 +83,7 @@ datasets: [
 
 const channelDaily = pusher.subscribe('tootCountDaily');
 
-client.get('http://127.0.0.1:8085/tootCountDaily', function(response) {
+client.get('http://67.216.197.45:8085/tootCountDaily', function(response) {
   var res = JSON.parse(response)
   res = res.filter(function(e) {return e != null})
   res = res.reverse()

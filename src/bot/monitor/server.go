@@ -17,7 +17,7 @@ import (
 func Listen() {
 	http.HandleFunc("/tootCountHourly", handlerHourly)
 	http.HandleFunc("/tootCountDaily", handlerDaily)
-	log.Fatal(http.ListenAndServe("127.0.0.1:8085", nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8085", nil))
 }
 
 type TootCountData struct {
