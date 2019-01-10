@@ -340,7 +340,7 @@ func drawChart(avatars []kvPair) string {
 	for i := range sbc.Bars {
 		sbc.Bars[i].Value = float64(avatars[i].count)
 		name := strings.Replace(avatars[i].key, ":cmx_elph:", "", -1)
-		name = strings.Replace(avatars[i].key, ":doughnut:", "", -1)
+		name = strings.Replace(name, ":doughnut:", "", -1)
 		sbc.Bars[i].Label = validLengthFilter(name, 12)
 	}
 
